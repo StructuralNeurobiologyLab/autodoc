@@ -8,7 +8,7 @@ from insert_docstrings import insert_docstrings
 from gpt_output import show_gpt_output
 
 
-with open("config.yaml", "r") as config_file:
+with open("code/config.yaml", "r") as config_file:
     config = yaml.safe_load(config_file)
 openai.api_key = config["api_key"]
 
@@ -31,7 +31,7 @@ def main(source_path: str) -> None:
 
     # PARAMETERS
     Model = 'gpt-4'  #"gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k" or 'gpt-3.5-turbo'
-    max_lno = 400  # max number of lines, when a file is split into snippets (for gpt)
+    max_lno = 300  # max number of lines, when a file is split into snippets (for gpt)
     cost = 'cheap'  #'cheap' or 'expensive'  # docstring generation for files < max_lno either via gpt-3.5-turbo(cheap) or gpt-4(expensive))
     write_gpt_output = True  #False or True  # write the gpt output into a file
     detailed = False  #False or True    #analysis of the repository: summarize all .md|.rst files

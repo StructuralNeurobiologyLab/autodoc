@@ -24,7 +24,7 @@ To use this tool, follow the steps below:
 
 5. Customize the parameters in the `main` function according to your needs. The available parameters are:
 
-   - `Model`: The GPT model to use for generating the docstrings. You can choose from "gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k", or "gpt-3.5-turbo". For Codes larger than 250 lines we recommend to use gpt-4-32k. The default value is "gpt-4".
+   - `Model`: The GPT model to use for generating the docstrings. You can choose from "gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k", or "gpt-3.5-turbo". gpt-3.5-turbo and gpt-3.5-turbo-16k can only be used if all codes are shorter than max_lno (do not have to be split into snippets). For Codes larger than 250 lines we recommend to use gpt-4-32k. The default value is "gpt-4".
 
    - `max_lno`: The maximum number of lines that the tool can handle in a single file. If a file is larger than this, it will be split into smaller snippets. To adjust this parameter read the [second bullet point](#notice) .The default value is 400.
 
@@ -34,10 +34,10 @@ To use this tool, follow the steps below:
 
    - `detailed`: whether .md and .rst files are combined and then summarized (True) or summarized individually, then merged and summarized again (False). You can choose between "True" and "False". The default value is "False".
 
-6. Run the `main.py` file using the following command:
+6. Run the `main.py` file using the following command (if current cwd is autodoc):
 
    ```
-   python main.py <URL or path(folder or file)>
+   python code/main.py <URL or path(folder or file)>
    ```
 
    The tool will clone the source code from the specified repository, analyze the repository, generate docstrings for each Python file, insert the docstrings back into the respective files, and optionally write the generated docstrings into separate files.

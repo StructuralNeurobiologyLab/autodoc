@@ -1,3 +1,4 @@
+import warnings
 from gptapi import gptapi
 from summarize_file import code_info, node_info
 from make_snippets import make_snippets
@@ -78,6 +79,10 @@ def create_docstrings(file_path: str, additional_info: str = None, max_lno: int 
 
     elif no_lines > max_lno:
         print('analyzing file by splitting it into snippets: ', file_path)
+        if Model in ('gpt-3.5-turbo', 'gpt-3.5-turbo-16k'):
+            print(f'    WARNING: The current file exceeds max_lno, but you use a gpt3 model - which is not recommended for files > max_lno')
+            print(f'    skip file: {file_path}')
+            return ''
         info_file = f'info about file: \n{code_info(file_path)}'
         info = (additional_info + info_file) if additional_info else info_file
         code_snippets = make_snippets(file_path, max_lno=max_lno)
