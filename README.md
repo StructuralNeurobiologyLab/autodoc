@@ -24,9 +24,9 @@ To use this tool, follow the steps below:
 
 5. Customize the parameters in the `main` function according to your needs. The available parameters are:
 
-   - `Model`: The GPT model to use for generating the docstrings. You can choose from "gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k", or "gpt-3.5-turbo". The default value is "gpt-4".
+   - `Model`: The GPT model to use for generating the docstrings. You can choose from "gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k", or "gpt-3.5-turbo". For Codes larger than 250 lines we recommend to use gpt-4-32k. The default value is "gpt-4".
 
-   - `max_lno`: The maximum number of lines that the tool can handle in a single file. If a file is larger than this, it will be split into smaller snippets. The default value is 400.
+   - `max_lno`: The maximum number of lines that the tool can handle in a single file. If a file is larger than this, it will be split into smaller snippets. To adjust this parameter read the [second bullet point](#notice) .The default value is 400.
 
    - `cost`: The cost of generating the docstrings if the file is not split into snippets. You can choose between "cheap" and "expensive". "cheap" will use the "gpt-3.5-turbo" model and the output will be the whole file (code + docstrings). "expensive" will use the "gpt-4" model and the output will be only the docstrings. The default value is "expensive".
 
@@ -44,9 +44,18 @@ To use this tool, follow the steps below:
 
 7. After the tool finishes running, you can find the edited repository in the "edited_repository" folder of your current working directory. The Python files in the repository will now have detailed Google format docstrings inserted.
 
-## Notice:
+## Notice: {#notice}
 
-The analysis of the .md and .rst files (analyze_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
+- The analysis of the .md and .rst files (analyze_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
+
+- The larger the maximum input to the model, the more code can be processed at once. As a result, GPT understands the code better and can generate more accurate docstrings. For optimal docstrings it is therefore recommended to select the largest possible model (gpt-4-32k) and to set the maximum code length (max_lno) as high as possible(~1500). <br>
+max_lno can be roughly estimated: <br>
+   max_lno = (max_model_tokens - info_repo_tokens - info_code_tokens) : 20 <br>
+   One token is roughly 4 characters and 0.75 English words. One line of code has roughly 20 tokens. <br>
+   If calculated very generously: Info_repo = (2000 tokens|1500 words), info_code = (4000 tokens|3000 words) and we use gpt-4-32k then <br>
+   max_lno = (32k - 2k - 4k) : 20 = 1300 [lines].
+
+- The costs can also be estimated using the above estimates. See also the [pricing](https://openai.com/pricing) of openai.
 
 ## Repository Structure
 
