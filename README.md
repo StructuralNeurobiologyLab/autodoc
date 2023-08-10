@@ -44,7 +44,7 @@ To use this tool, follow the steps below:
 
 7. After the tool finishes running, you can find the edited repository in the "edited_repository" folder of your current working directory. The Python files in the repository will now have detailed Google format docstrings inserted.
 
-## Notice: {#notice}
+## Notice: 
 
 - The analysis of the .md and .rst files (analyze_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
 
