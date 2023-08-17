@@ -2,7 +2,7 @@ import os
 import openai
 import yaml
 from clone_source import clone_source
-from analyze_repo import analyze_repo
+from summarize_repo import summarize_repo
 from create_docstrings import create_docstrings
 from insert_docstrings import insert_docstrings
 from gpt_output import show_gpt_output
@@ -28,13 +28,13 @@ def main(source_path: str) -> None:
     Returns:
         None
     """
-
+#Wenn expensive, immer 32k, wenn cheap, dann 16k wenn file_länge<300
     # PARAMETERS
-    Model = 'gpt-4'  #"gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k" or 'gpt-3.5-turbo'
-    max_lno = 300  # max number of lines, when a file is split into snippets (for gpt)
+    Model = 'gpt-4-32k'  #"gpt-4-32k",
+    max_lno = 1200  # max number of lines, when a file is split into snippets (for gpt)  #1200 with 32k, 
     cost = 'cheap'  #'cheap' or 'expensive'  # docstring generation for files < max_lno either via gpt-3.5-turbo(cheap) or gpt-4(expensive))
     write_gpt_output = True  #False or True  # write the gpt output into a file
-    detailed = False  #False or True    #analysis of the repository: summarize all .md|.rst files
+    detailed = True  #False or True    #analysis of the repository: summarize all .md|.rst files
                                         #if True, all .md|.rst files are combined into a single string and fed into the gptAPI (may be too long for gpt)
                                         #if False, each .md|.rst file is summarized individually and the summaries are combined into a final summary
 
@@ -51,7 +51,7 @@ def main(source_path: str) -> None:
     clone_source(source_path, target_dir)  # returns 'file' if input is a file
 
     # INFO ABOUT REPOSITORY
-    info_repo = 'info about repository:\n' + analyze_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed) + '\n'
+    info_repo = 'info about repository:\n' + summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed) + '\n'
     # print(info_repo)
 
     # CREATE DOCSTRINGS

@@ -4,7 +4,7 @@ from summarize_file import code_info, node_info
 from make_snippets import make_snippets
 
 
-def create_docstrings(file_path: str, additional_info: str = None, max_lno: int = 500, Model: str = "gpt-3.5-turbo", 
+def create_docstrings(file_path: str, additional_info: str = None, max_lno: int = 300, Model: str = "gpt-4-32k", 
                  cost: str = 'cheap'):
     """
     Generates detailed Google format docstrings for each function and class in a given Python file using the gptapi. 
@@ -29,8 +29,9 @@ def create_docstrings(file_path: str, additional_info: str = None, max_lno: int 
         file.seek(0)
         no_lines = len(file.readlines())
 
-    if no_lines <= max_lno and cost == 'cheap':
-        print('analyze file directly: ', file_path)
+    if no_lines <= 300 and cost == 'cheap':
+        Model = 'gpt-3.5-turbo-16k'
+        print(f'Analyze file directly using {Model}: ', file_path)
         command = """
         Output this same code with DETAILED docstrings (or try to improve if one already exists)
         in google format for all 
@@ -45,7 +46,7 @@ def create_docstrings(file_path: str, additional_info: str = None, max_lno: int 
         """
         command = ' '.join(line.strip() for line in command.split('\n')).strip()
         print("    Docstrings are generated. Waiting for a gpt response...")
-        edited_code = gptapi(code, command, additional_info=additional_info, Model='gpt-3.5-turbo') #gptapi(code, command, additional_info=additional_info, Model = 'gpt-3.5-turbo')
+        edited_code = gptapi(code, command, additional_info=additional_info, Model=Model) #gptapi(code, command, additional_info=additional_info, Model = 'gpt-3.5-turbo')
         code_lines = edited_code.split('\n')
         if code_lines[0].startswith('\'\'\'python'):
             del code_lines[0]
@@ -55,9 +56,10 @@ def create_docstrings(file_path: str, additional_info: str = None, max_lno: int 
 
 
         return edited_code
+
     
-    if no_lines <= max_lno and cost == 'expensive':
-        print('analyze file directly: ', file_path)
+    if (no_lines <= max_lno and cost == 'expensive') or (300<no_lines<=max_lno and cost == 'cheap'):
+        print(f'analyze file directly using {Model}: ', file_path)
         command = """
         For the given code snippet below "code to be edited:" output detailed 
         docstrings (or try to improve if one already exists) in google format 
@@ -73,16 +75,16 @@ def create_docstrings(file_path: str, additional_info: str = None, max_lno: int 
         """
         command = ' '.join(line.strip() for line in command.split('\n')).strip()
         print("    Docstrings are generated. Waiting for a gpt response...")
-        docstrings = gptapi(code, command, additional_info=additional_info, Model='gpt-4')
+        docstrings = gptapi(code, command, additional_info=additional_info, Model=Model)
 
         return docstrings
 
     elif no_lines > max_lno:
         print('analyzing file by splitting it into snippets: ', file_path)
-        if Model in ('gpt-3.5-turbo', 'gpt-3.5-turbo-16k'):
-            print(f'    WARNING: The current file exceeds max_lno, but you use a gpt3 model - which is not recommended for files > max_lno')
-            print(f'    skip file: {file_path}')
-            return ''
+        # if Model in ('gpt-3.5-turbo', 'gpt-3.5-turbo-16k'):
+        #     print(f'    WARNING: The current file exceeds max_lno, but you use a gpt3 model - which is not allowed for files > max_lno')
+        #     print(f'    skip file: {file_path}')
+        #     return ''
         info_file = f'info about file: \n{code_info(file_path)}'
         info = (additional_info + info_file) if additional_info else info_file
         code_snippets = make_snippets(file_path, max_lno=max_lno)

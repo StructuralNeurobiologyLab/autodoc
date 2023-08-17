@@ -102,11 +102,7 @@ def insert_1_docstring(node_doc, file_path):
                         shifted_docstring = shift_docstring(docstring, indent)
                         lines_code.insert(start-1, shifted_docstring)
                     if ast.get_docstring(node_code) is None:
-                        """
-                        use the first child node as reference for the insertion point
-                        of the docstring as well as the indentation
-                        """
-                        start = node_code.body[0].lineno - 1
+                        start = find_end_of_definition(lines_code, node_code) - 1
                         indent = node_code.body[0].col_offset
                         shifted_docstring = shift_docstring(docstring, indent)
                         lines_code.insert(start, shifted_docstring)
@@ -117,3 +113,28 @@ def insert_1_docstring(node_doc, file_path):
     with open(file_path, "w") as file:
         file.truncate()
         file.write(''.join(lines_code))
+
+
+def find_end_of_definition(code_lines, node):
+    """
+    Finds the end line of a class or function definition in a code file.
+    
+    Args:
+        code_lines (list): The list of lines in the code file.
+        node (ast.AST): The AST node representing the class or function definition.
+    
+    Returns:
+        int: The line number of the end of the definition.
+    """
+    start_lno = node.__dict__['lineno']
+    end_lno = node.body[0].lineno
+    starting_text = code_lines[start_lno-1:end_lno-1]
+    
+    pattern = '(:\s*)$|(:\s*#.*$)'
+    
+    for i, line in enumerate(starting_text, start=1):
+        matches = re.search(pattern, line, re.M)
+        if matches:
+            break
+    
+    return start_lno + i

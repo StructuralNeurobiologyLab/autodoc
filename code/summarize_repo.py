@@ -1,8 +1,7 @@
-import ast
 import openai
 import os
 
-def analyze_repo(file_path: str, Model: str, detailed: bool = False) -> str:
+def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: bool = True) -> str:
     """
     Analyzes a repository and generates a summary using the gptAPI.
     
@@ -34,9 +33,10 @@ def analyze_repo(file_path: str, Model: str, detailed: bool = False) -> str:
         all_content = "\n\n".join(all_content)
 
         command = """
-            Generate a detailed summary for this repository. It is later used 
+            Generate a very detailed summary for this repository. It is later used 
             to provide additional information when analyzing the code to 
-            generate docstrings using the gptAPI.
+            generate docstrings using the gptAPI. Focus especially on the methodologies.
+            The summary should contain maximum information about the repository but should not be longer than 1000 tokens.
             Just output the summary.
             """
         response = openai.ChatCompletion.create(

@@ -32,7 +32,7 @@ To use this tool, follow the steps below:
 
    - `write_gpt_output`: Whether to write the generated docstrings into separate files. Set this to `True` if you want to save the docstrings in a separate file for each Python file in the repository. The default value is `True`.
 
-   - `detailed`: whether .md and .rst files are combined and then summarized (True) or summarized individually, then merged and summarized again (False). You can choose between "True" and "False". The default value is "False".
+   - `detailed`: whether .md and .rst files are combined and then summarized (True) or summarized individually, then merged and summarized again (False). You can choose between "True" and "False". The default value is "True".
 
 6. Run the `main.py` file using the following command (if current cwd is autodoc):
 
@@ -46,7 +46,7 @@ To use this tool, follow the steps below:
 
 ## Notice: 
 
-- The analysis of the .md and .rst files (analyze_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
+- The analysis of the .md and .rst files (summarize_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
 
 - The larger the maximum input to the model, the more code can be processed at once. As a result, GPT understands the code better and can generate more accurate docstrings. For optimal docstrings it is therefore recommended to select the largest possible model (gpt-4-32k) and to set the maximum code length (max_lno) as high as possible(~1500). <br>
 max_lno can be roughly estimated: <br>
@@ -75,7 +75,7 @@ The repository contains the following files:
 
 - `clone_source.py`: This file contains the function `clone_source` that clones or copies the source code to the target directory.
 
-- `analyze_repo.py`: This file contains the function `analyze_repo` that analyzes a repository and generates a summary using the GPT API.
+- `summarize_repo.py`: This file contains the function `summarize_repo` that analyzes a repository and generates a summary using the GPT API.
 
 - `gpt_output.py`: This file contains the function `show_gpt_output` that writes the generated docstrings to a file in the specified directory.
 
