@@ -90,8 +90,8 @@ if __name__ == "__main__":
     parser.add_argument("--cost", type=str, default='expensive', help="('expensive'/'cheap'); expensive: always uses gpt-4-32k; cheap: uses gpt-3.5-turbo-16k for files < 300 lines and gpt-4-32k for files > 300 lines")
     parser.add_argument("--write_gpt_output", dest='write_gpt_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); writes the GPT output/docstrings into a folder 'gpt-output' within the folder eddited repository ")
     parser.add_argument("--detailed_repo_summary", dest='detailed_repo_summary', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); True: all .md|.rst files are combined into a single string and fed into the gptAPI (may be too long for gpt -> False); False: each .md|.rst file is summarized individually and the summaries are combined into a final summary")
-    parser.add_argument("--max_lno", type=int, default=1200, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
-    parser.add_argument("--Model", type=str, default='gpt-4-32', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
+    parser.add_argument("--max_lno", type=int, default=300, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
+    parser.add_argument("--Model", type=str, default='gpt-4', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
 
     args = parser.parse_args()
     

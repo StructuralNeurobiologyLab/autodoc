@@ -1,50 +1,63 @@
 # Automatic Code Documentation Tool
 
-This repository provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
+The `autodoc` repository provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
 
-## How to Use
+< :warning: **Warning:** `gpt-4-32k` is currently not available. Therefore the following default values are currently changed:
+- `--Model:` before: 'gpt-4-32k'; now: 'gpt-4'
+- `--max_lno:` before: 1200; now: 300
 
-To use this tool, follow the steps below:
+## Usage
 
-1. Clone or download this repository to your local machine.
+To use the `autodoc` tool, follow these steps:
 
-2. Install the required dependencies by running the following command:
+1. Clone or download the `autodoc` repository to your local machine.
+2. Install the required dependencies by running `pip install -r requirements.txt`.
+3. Navigate to the root directory of the `autodoc` repository in your terminal and run main.py (see [example usage](#example-usage)).
 
-   ```
-   pip install -r requirements.txt
-   ```
+### Command Line Arguments
 
-3. Create a `config.yaml` file in the root directory of the repository and add your OpenAI API key to it. The `config.yaml` file should have the following format:
+The `autodoc` tool accepts the following command line arguments:
 
-   ```yaml
-   api_key: "YOUR_API_KEY"
-   ```
+- `source_path` (required): The URL/path of the GitHub repository or the directory/file to be analyzed and documented.
+- `--cost` (optional): The cost of generating the docstrings (further explanation below). Choose between 'expensive' (default) or 'cheap'.
+- `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
+- `--detailed_repo_summary` (optional): Whether to generate a detailed (further explanation below) summary of the repository (by summarizing all .md & .rst files). Choose between True (default) or False.
+- `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. Default is 1200.
+- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
 
-4. Open the `main.py` file and modify the `source_path` variable to specify the URL or path of the Python repository you want to analyze and document.
+**Further Explanation:**
 
-5. Customize the parameters in the `main` function according to your needs. The available parameters are:
+- `cost:` With `expensive`, all files are always edited with the specified `Model`. With `cheap`, all files with fewer lines than `max_lno` are edited with gpt-3.5-turbo-16k, and only the larger files use the given model (e.g., gpt-4).
+- `detailed_repo_summary:` If `True`, then all .md and .rst files are merged at once by gpt. However, if there are many long .md files in the repository, they may have more than 16k tokens in total. Then each .md|.rst file will be summarized separately, and all summaries will be merged again (if set to `False`).
 
-   - `Model`: The GPT model to use for generating the docstrings. You can choose from "gpt-4-32k", "gpt-4", "gpt-3.5-turbo-16k", or "gpt-3.5-turbo". gpt-3.5-turbo and gpt-3.5-turbo-16k can only be used if all codes are shorter than max_lno (do not have to be split into snippets). For Codes larger than 250 lines we recommend to use gpt-4-32k. The default value is "gpt-4".
+### Example Usage
 
-   - `max_lno`: The maximum number of lines that the tool can handle in a single file. If a file is larger than this, it will be split into smaller snippets. To adjust this parameter read the [second bullet point](#notice) .The default value is 400.
+To generate and insert docstrings into a repository, run the following command:
 
-   - `cost`: The cost of generating the docstrings if the file is not split into snippets. You can choose between "cheap" and "expensive". "cheap" will use the "gpt-3.5-turbo" model and the output will be the whole file (code + docstrings). "expensive" will use the "gpt-4" model and the output will be only the docstrings. The default value is "expensive".
+```
+python main.py <source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
+```
 
-   - `write_gpt_output`: Whether to write the generated docstrings into separate files. Set this to `True` if you want to save the docstrings in a separate file for each Python file in the repository. The default value is `True`.
+Replace `<source_path>` with the URL/path of the GitHub repository or the directory/file to be analyzed and documented. You can also provide the optional arguments as needed.
 
-   - `detailed`: whether .md and .rst files are combined and then summarized (True) or summarized individually, then merged and summarized again (False). You can choose between "True" and "False". The default value is "True".
+### Example Command
 
-6. Run the `main.py` file using the following command (if current cwd is autodoc):
+```
+python main.py https://github.com/example/repo --max_lno 300 --Model gpt-4 --cost expensive --write_gpt_output True --detailed_repo_summary True
+```
 
-   ```
-   python code/main.py <URL or path(folder or file)>
-   ```
-
-   The tool will clone the source code from the specified repository, analyze the repository, generate docstrings for each Python file, insert the docstrings back into the respective files, and optionally write the generated docstrings into separate files.
-
-7. After the tool finishes running, you can find the edited repository in the "edited_repository" folder of your current working directory. The Python files in the repository will now have detailed Google format docstrings inserted.
+This command will analyze the repository at the given URL, generate detailed docstrings using the 'gpt-4-32' model, and insert them back into the respective files. It will also write the generated docstrings into a separate file if enabled.
 
 ## Notice: 
+
+- I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point.
+
+   ```
+   python cost_estimator.py <URL or path(folder or file)>
+   ```
+See also the [pricing](https://openai.com/pricing) of openai.
+
+- If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.
 
 - The analysis of the .md and .rst files (summarize_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 54)
 
@@ -55,35 +68,23 @@ max_lno can be roughly estimated: <br>
    If calculated very generously: Info_repo = (2000 tokens|1500 words), info_code = (4000 tokens|3000 words) and we use gpt-4-32k then <br>
    max_lno = (32k - 2k - 4k) : 20 = 1300 [lines].
 
-- The costs can also be estimated using the above estimates. See also the [pricing](https://openai.com/pricing) of openai.
+## Repository Files
 
-## Repository Structure
+The `autodoc` repository contains the following files:
 
-The repository contains the following files:
+- `gpt_output.py`: Contains the `show_gpt_output` function, which writes the generated docstrings to a file in the specified directory.
+- `main.py`: The main script that orchestrates the entire process of generating and inserting docstrings into a given repository.
+- `create_docstrings.py`: Contains the `create_docstrings` function, which generates detailed Google format docstrings for each function and class in a given Python file.
+- `gptapi.py`: Contains the `gptapi` function, which generates a GPT output for the given code and command using the OpenAI API.
+- `make_snippets.py`: Contains the `make_snippets` function, which generates code snippets from a file based on the maximum number of lines.
+- `summarize_repo.py`: Contains the `summarize_repo` function, which analyzes a repository and generates a summary using the gptAPI.
+- `clone_source.py`: Contains the `clone_source` function, which clones or copies the source code to the target directory.
+- `insert_docstrings.py`: Contains the `insert_docstrings` function, which inserts docstrings into a Python file at the appropriate locations.
+- `summarize_file.py`: Contains the `gen_shifted_docstring` and `node_info` functions, which extract the definition and docstring of a class or function from an abstract syntax tree node.
+- `README.md`: The README file for the `autodoc` repository.
 
-- `create_docstrings.py`: This file contains the main function `create_docstrings` that generates detailed Google format docstrings for a given Python file.
+Please refer to the individual files for more detailed information about their functionality and implementation.
 
-- `config.yaml`: This file stores the OpenAI API key.
+## Bugs
 
-- `make_snippets.py`: This file contains the function `make_snippets` that generates code snippets from a file based on the maximum number of lines.
-
-- `gptapi.py`: This file contains the function `gptapi` that generates a GPT output for the given code and command using the OpenAI API.
-
-- `requirements.txt`: This file lists the required dependencies for running the tool.
-
-- `main.py`: This file contains the main function `main` that orchestrates the entire process of generating and inserting docstrings into a given repository.
-
-- `clone_source.py`: This file contains the function `clone_source` that clones or copies the source code to the target directory.
-
-- `summarize_repo.py`: This file contains the function `summarize_repo` that analyzes a repository and generates a summary using the GPT API.
-
-- `gpt_output.py`: This file contains the function `show_gpt_output` that writes the generated docstrings to a file in the specified directory.
-
-- `summarize_file.py`: This file contains the functions `node_info` and `code_info` that extract the class and function definitions from a Python file.
-
-- `insert_docstrings.py`: This file contains the functions `shift_docstring`, `remove_start_end_lines`, and `insert_docstrings` that insert docstrings into a Python file at the appropriate locations.
-
-
-## Conclusion
-
-This tool provides a convenient way to automatically generate detailed Google format docstrings for each function and class in a Python repository. By utilizing the GPT API, it can generate accurate and context-aware docstrings that can improve code documentation and readability.
+If any errors occur, feel free to write me a message. I will try to fix the problem as soon as I can.
