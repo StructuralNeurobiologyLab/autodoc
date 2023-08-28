@@ -2,7 +2,7 @@
 
 The `autodoc` repository provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
 
-< :warning: **Warning:** `gpt-4-32k` is currently not available. Therefore the following default values are currently changed:
+:warning: **Warning:** `gpt-4-32k` is currently not available. Therefore the following default values are currently changed:
 - `--Model:` before: 'gpt-4-32k'; now: 'gpt-4'
 - `--max_lno:` before: 1200; now: 300
 
@@ -50,12 +50,11 @@ This command will analyze the repository at the given URL, generate detailed doc
 
 ## Notice: 
 
-- I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point.
+- I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point. See also the [pricing](https://openai.com/pricing) of openai.
 
    ```
    python cost_estimator.py <URL or path(folder or file)>
    ```
-See also the [pricing](https://openai.com/pricing) of openai.
 
 - If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.
 
