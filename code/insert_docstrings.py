@@ -25,7 +25,7 @@ def shift_docstring(docstring, indent):
     return shifted_docstring
 
 
-def remove_start_end_lines(code_string):
+def remove_start_end_lines(docstrings):
     """
     Removes the start and end lines from a code string.
     
@@ -36,10 +36,9 @@ def remove_start_end_lines(code_string):
         str: The cleaned code string with start and end lines removed.
     """
     # Define the pattern to match the start and end lines
-    pattern = r"(^start$|end$)"
-
+    pattern = r'(^start$|^end$|^```python$|^```$|^(?!def|class)([a-zA-Z_]\w*)\s*\([^)]*\):\s*(\'\'\'[^\'\']*\'\'\'|"""[^"]*"""))'
     # Use regular expressions to remove the matched lines
-    cleaned_code = re.sub(pattern, "", code_string, flags=re.MULTILINE)
+    cleaned_code = re.sub(pattern, "", docstrings, flags=re.MULTILINE | re.DOTALL)
 
     return cleaned_code
 

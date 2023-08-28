@@ -1,8 +1,8 @@
 import openai
 
 
-def gptapi(code: str, command: str, additional_info: str = None, 
-            temperature: float = 0.1, Model: str = "gpt-3.5-turbo") -> str:
+def gptapi(code: str, command: str, Model: str, additional_info: str = None, 
+            temperature: float = 0.2) -> str:
     """
     Generates a GPT output for the given code and command using the OpenAI API.
     

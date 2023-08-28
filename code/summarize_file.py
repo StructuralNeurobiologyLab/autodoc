@@ -2,6 +2,30 @@ import ast
 import astunparse
 import os
 
+
+def gen_shifted_docstring(node):
+    """
+    Generates a shifted docstring for a given node. If the node does not have a docstring, it 
+    returns an empty string.
+    
+    Args:
+        node (ast.AST): An abstract syntax tree node representing a Python class or function.
+    
+    Returns:
+        str: A string containing the shifted docstring of the node, or an empty string if the 
+        node does not have a docstring.
+    """
+    if ast.get_docstring(node) is None:
+        return ''
+    
+    docstring = "\n".join(['"""' , ast.get_docstring(node), '"""'])
+    lines = docstring.strip().split("\n")
+    shifted_lines = [' ' * 4 + " " * node.col_offset + line for line in lines]
+    shifted_docstring = "\n".join(shifted_lines) + "\n"
+    
+    return shifted_docstring
+
+
 def node_info(node):
     """
     Extracts the definition (def/class: name(args)) of a class or function and its docstring with 
@@ -16,28 +40,6 @@ def node_info(node):
         str: A string containing the class or function definition and its docstring, properly 
         indented.
     """
-
-    def gen_shifted_docstring(node):
-        """
-        Generates a shifted docstring for a given node. If the node does not have a docstring, it 
-        returns an empty string.
-        
-        Args:
-            node (ast.AST): An abstract syntax tree node representing a Python class or function.
-        
-        Returns:
-            str: A string containing the shifted docstring of the node, or an empty string if the 
-            node does not have a docstring.
-        """
-        if ast.get_docstring(node) is None:
-            return ''
-        
-        docstring = "\n".join(['"""' , ast.get_docstring(node), '"""'])
-        lines = docstring.strip().split("\n")
-        shifted_lines = [' ' * 4 + " " * node.col_offset + line for line in lines]
-        shifted_docstring = "\n".join(shifted_lines) + "\n"
-        
-        return shifted_docstring
 
     if isinstance(node, (ast.ClassDef, ast.FunctionDef)):
         if isinstance(node, ast.FunctionDef):

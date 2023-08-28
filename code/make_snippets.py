@@ -13,8 +13,8 @@ def make_snippets(file_path: str, max_lno: int = 300):
         max_lno (int, optional): The maximum number of lines for each snippet. Defaults to 300.
     
     Returns:
-        list: A list of dictionaries. Each dictionary contains a code snippet (str) and its respective 
-        line count (int).
+        list: A list of dictionaries. Each dictionary contains a code snippet (str) ['code'] and its respective 
+        line count (int) ['lines'].
     """
 
     def length_of_node(node):

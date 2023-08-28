@@ -23,7 +23,7 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
     print('Summarizing repository using .rst and .md files ...')
     if detailed:
         all_content = []
-        for root, subdir, files in os.walk(file_path):
+        for root, _, files in os.walk(file_path):
             for file in files:
                 if file.endswith((".md", ".rst")):
                     file_path = os.path.join(root, file)
@@ -31,6 +31,9 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
                         content = file.read()
                     all_content.append(content)
         all_content = "\n\n".join(all_content)
+
+        if all_content == "":
+            return 'No additional info about the environment in which the file is embedded.'
 
         command = """
             Generate a very detailed summary for this repository. It is later used 
@@ -48,13 +51,14 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
             temperature=0.4,
         )
         summary = response['choices'][0]['message']['content']
+        output = f'info about repository:\n{summary}'
 
-        return summary
+        return output
     
 
     if not detailed:
         summary = []
-        for root, subdir, files in os.walk(file_path):
+        for root, _, files in os.walk(file_path):
             for file in files:
                 if file.endswith((".md", ".rst")):
                     file_path = os.path.join(root, file)
@@ -76,6 +80,10 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
                     summary.append(answer)
 
         summary = "\n\n".join(summary)
+
+        if summary == "":
+            return 'No additional info about the environment in which the file is embedded.'
+        
         command = """
             Generate a detailed summary for this repository. It is later used 
             to provide additional information when analyzing the code to 
@@ -91,5 +99,6 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
             temperature=0.4,
         )
         final_answer = response['choices'][0]['message']['content']
+        output = f'info about repository:\n{final_answer}'
 
-        return final_answer
+        return output
