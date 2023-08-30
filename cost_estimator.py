@@ -52,12 +52,12 @@ if __name__ == "__main__":
     shutil.rmtree(target_directory)
     
     cost_gpt_4_32k= (total_lines * 20 * 0.06 + total_words * 1.25 * 0.004) / 1000  #currently for gpt-4 == 0.06$/1000 tokens... gpt-4-32k currently not available
-    cost_gpt_3_5_16k = ((((total_lines - lines_above_max)*20*2) + (total_words *1.25)) * 0.004 + (lines_above_max * 20) * 0.12) / 1000
+    cost_gpt_3_5_16k = ((((total_lines - lines_above_max)*20*2) + (total_words *1.25)) * 0.004 + (lines_above_max * 20) * 0.06) / 1000
     
     print(f"Total lines of code: {total_lines} -> {total_lines * 20} tokens")
     print(f"Total words in .rst and .md files: {total_words} -> {total_words * 1.25} tokens (< 16k tokens!!! else detailed == False)")
     print(f"Number of files with more than {max_lno} lines: {num_files_above_max}")
-    print(f"Total lines in files above {max_lno} lines: {lines_above_max} -> {lines_above_max * 20} tokens (with gpt4-32k)")
+    print(f"Total lines in files above {max_lno} lines: {lines_above_max} -> {lines_above_max * 20} tokens (with gpt4)")
     print(f"Estimated cost with gpt-4: {cost_gpt_4_32k:.2f}$")
     print(f"Estimated cost with gpt-3.5-16k: {cost_gpt_3_5_16k:.2f}$")
     print('Keep in mind: these are just estimates!')
