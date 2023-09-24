@@ -31,7 +31,7 @@ def node_info(node):
     Extracts the definition (def/class: name(args)) of a class or function and its docstring with 
     proper indentation from an abstract syntax tree node. This function does not distinguish 
     between a class defined with or without parentheses. For example, class Organelle: and class 
-    Organelle(): are both parsed as class Organelle:.
+    Organelle(): are both parsed as class Organelle: .
     
     Args:
         node (ast.AST): An abstract syntax tree node representing a Python class or function.
@@ -47,8 +47,15 @@ def node_info(node):
             args = f"({astunparse.unparse(node.args).strip()})"
         if isinstance(node, ast.ClassDef):
             name = "class " + node.name
-            bases = [base for base in node.bases]
-            args = f"({', '.join([base.id for base in bases])})" if bases else ''
+            args = []
+            for base in node.bases:
+                if isinstance(base, ast.Name):
+                    args.append(base.id)
+                elif isinstance(base, ast.Attribute):
+                    args.append(base.attr)
+                else:
+                    print(3*'    ' + f'Argument of class {node.name} is not a Name or Attribute -> not supported yet.')
+            args = f"({', '.join(args)})" if args else ''
 
         indent = " " * node.col_offset
         shifted_name_args = f"{indent}{name}{args}:"

@@ -3,22 +3,23 @@ import os
 
 def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: bool = True) -> str:
     """
-    Analyzes a repository and generates a summary using the gptAPI.
+    Analyzes a repository and generates a summary using the GPT API.
     
     This function takes in the path of a repository, a model, and a boolean indicating whether a detailed 
-    analysis is required. It reads all .md and .rst files in the repository, feeds them into the gptAPI, 
+    analysis is required. It reads all .md and .rst files in the repository, feeds them into the GPT API, 
     and generates a summary. If the detailed flag is set to True, all files are combined into a single 
-    string and fed into the gptAPI. If the detailed flag is set to False, each file is summarized 
+    string and fed into the GPT API. If the detailed flag is set to False, each file is summarized 
     individually and the summaries are combined into a final summary.
     
     Args:
         file_path (str): The path of the repository to be analyzed.
-        Model (str): The model to be used by the gptAPI for generating the summary.
+        Model (str): The model to be used by the GPT API for generating the summary.
         detailed (bool, optional): A flag indicating whether a detailed analysis is required. 
-                                   Defaults to False.
+                                   Defaults to True.
     
     Returns:
-        str: The generated summary of the repository.
+        str: The generated summary of the repository. If no additional information about the environment 
+             in which the file is embedded is found, None is returned.
     """
     print('Summarizing repository using .rst and .md files ...')
     if detailed:
@@ -33,7 +34,8 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
         all_content = "\n\n".join(all_content)
 
         if all_content == "":
-            return 'No additional info about the environment in which the file is embedded.'
+            print('    No additional info about the environment in which the file is embedded.')
+            return None
 
         command = """
             Generate a very detailed summary for this repository. It is later used 
@@ -82,7 +84,8 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
         summary = "\n\n".join(summary)
 
         if summary == "":
-            return 'No additional info about the environment in which the file is embedded.'
+            print('    No additional info about the environment in which the file is embedded.')
+            return None
         
         command = """
             Generate a detailed summary for this repository. It is later used 

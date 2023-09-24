@@ -5,16 +5,46 @@ import shutil
 import subprocess
 
 def count_lines(file_path):
+    """
+    Counts the number of non-empty lines in a file.
+    
+    Args:
+        file_path (str): The path to the file.
+        
+    Returns:
+        int: The number of non-empty lines in the file.
+    """
     with open(file_path, "r") as file:
         return sum(1 for line in file if line.strip() != "")
 
 def count_words(file_path):
+    """
+    Counts the number of words in a file. A word is defined as a sequence of alphanumeric characters.
+    
+    Args:
+        file_path (str): The path to the file.
+        
+    Returns:
+        int: The number of words in the file.
+    """
     with open(file_path, "r") as file:
         content = file.read()
         words = re.findall(r'\w+', content)
         return len(words)
 
 def count_code_and_words(directory, max_lno):
+    """
+    Counts the total lines of code and words in all Python, .rst, and .md files in a directory.
+    Also counts the number of files with lines of code above a maximum limit and the total lines in these files.
+    
+    Args:
+        directory (str): The path to the directory.
+        max_lno (int): The maximum limit for lines of code in a file.
+        
+    Returns:
+        tuple: The total lines of code, total words, number of files with lines of code above max_lno, 
+               and total lines in these files.
+    """
     total_lines = 0
     total_words = 0
     num_files_above_max = 0

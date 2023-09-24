@@ -3,11 +3,12 @@ from distutils.util import strtobool
 import os
 import openai
 import yaml
-from clone_source import clone_source
+from clone_source import clone_source, copy_py_files
 from summarize_repo import summarize_repo
 from create_docstrings import create_docstrings
 from insert_docstrings import insert_docstrings
 from gpt_output import show_gpt_output
+import traceback
 
 
 with open("code/config.yaml", "r") as config_file:
@@ -17,8 +18,9 @@ openai.api_key = config["api_key"]
 
 def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = True, detailed_repo_summary: bool = True, max_lno: int = 1200, Model: str = 'gpt-4-32k') -> None:
     """
-    The main function that orchestrates the entire process of generating and inserting docstrings into a 
-    given repository. It performs the following steps:
+    Orchestrates the process of generating and inserting docstrings into a given repository.
+    
+    This function performs the following steps:
     1. Clones the source code from the provided URL/path.
     2. Analyzes the repository.
     3. Generates docstrings for each Python file in the repository.
@@ -27,6 +29,13 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
     
     Args:
         source_path (str): The URL/path of the GitHub repository to be analyzed and documented.
+        cost (str, optional): The cost of the GPT model used for docstring generation. Defaults to 'expensive'.
+        write_gpt_output (bool, optional): If True, writes the GPT output/docstrings into a separate file. 
+            Defaults to True.
+        detailed_repo_summary (bool, optional): If True, generates a detailed summary of the repository. 
+            Defaults to True.
+        max_lno (int, optional): The maximum number of lines to split the code. Defaults to 1200.
+        Model (str, optional): The GPT model used for docstring generation. Defaults to 'gpt-4-32k'.
     
     Returns:
         None
@@ -44,32 +53,40 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
     # CLONE SOURCE
     target_dir = os.path.join(os.getcwd(), "edited_repository")
     clone_source(source_path, target_dir)  # returns 'file' if input is a file
+    path_dest = os.path.join(target_dir, 'gpt_output') #path to the gpt_output folder
+        
 
     # INFO ABOUT REPOSITORY
-    info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary) + '\n'
+    info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary)
+
 
     # CREATE DOCSTRINGS
-    print('Analyzing files and waiting for a gpt response:')
-    for root, _ , files in os.walk(target_dir):
+    print('\nAnalyzing files:')
+    for root, dirs , files in os.walk(target_dir):
+        if 'gpt_output' in dirs:
+            dirs.remove('gpt_output') #exlude gpt_output folder from analysis
         for file in files:
             if file.endswith(".py"):
                 file_path = os.path.join(root, file)
-                # in the next line the file is analyzed (if file > man_lno) and the docstrings are generated
-                docstrings = create_docstrings(file_path, additional_info=info_repo, max_lno=max_lno, Model=Model, cost=cost)
+                gpt_path = os.path.join(path_dest, os.path.relpath(file_path, target_dir))
 
-                # Write docstrings(/gpt-output) into a file (if enabled)
-                if write_gpt_output:
-                    show_gpt_output(target_dir=target_dir, file=file, docstrings=docstrings)
+                #in the next line the file is analyzed (if file > man_lno), docstrings are generated and saved in gpt_output (if enabled)
+                docstrings = create_docstrings(file_path, additional_info=info_repo, 
+                                              max_lno=max_lno, Model=Model, cost=cost,
+                                              write_gpt_output=write_gpt_output, gpt_path=gpt_path)
 
+                # inserts docstrings
                 try:
-                    insert_docstrings(file_path, docstrings)  # inserts only the docstrings into the file
+                    insert_docstrings(file_path, docstrings) 
                 except Exception as err:
                     print(f'    Error: {err}')
+                    traceback.print_exc()
                     print('    Could not insert docstrings.')
                     print('    The file will be skipped.')
                     continue
                 
-    if write_gpt_output:
+    #also copy info_repo in gpt_output
+    if write_gpt_output and info_repo != None:
         dest_path = os.path.join(target_dir, 'gpt_output')
         with open(os.path.join(dest_path, 'info_repo'), "w") as file:
             file.write(info_repo)

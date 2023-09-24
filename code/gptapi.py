@@ -13,12 +13,11 @@ def gptapi(code: str, command: str, Model: str, additional_info: str = None,
     Args:
         code (str): The code that needs to be analyzed and edited.
         command (str): The command that specifies the type of editing to be performed on the code.
+        Model (str): The GPT model to be used for generating the output.
         additional_info (str, optional): Additional contextual information about the code. This could 
         include details about the repository the code is embedded in. Defaults to None.
         temperature (float, optional): The temperature parameter for the GPT model. A higher value 
-        makes the output more random, while a lower value makes it more deterministic. Defaults to 0.1.
-        Model (str, optional): The model to be used for generating the GPT output. Defaults to 
-        "gpt-3.5-turbo".
+        makes the output more random, while a lower value makes it more deterministic. Defaults to 0.2.
     
     Returns:
         str: The generated GPT output which could be a detailed summary or docstring based on the 

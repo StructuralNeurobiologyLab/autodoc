@@ -23,22 +23,26 @@ def is_valid_url(url: str) -> bool:
 
 def clone_source(input: str, target_dir: str) -> None:
     """
-    Clones or copies the source code to the target directory. The source code can be a GitHub 
-    repository, a local directory, or a local file. This function is used to prepare the 
-    environment for the analysis of the code and the generation of docstrings.
+    Clones a source from a given input (URL or local path) into a target directory. If the input is a valid
+    URL, it clones the repository into the target directory. If the input is a valid local directory, it copies
+    the directory into the target directory. If the input is a valid local file, it copies the file into the
+    target directory. If the input is neither a valid URL nor a valid local path, it raises a ValueError.
     
     Args:
-        input (str): The source code to be copied. It can be a URL of a GitHub repository, 
-                     a path of a local directory, or a path of a local file.
-        target_dir (str): The directory where the source code will be copied.
+        input (str): The input source to be cloned. It can be a URL or a local path.
+        target_dir (str): The target directory where the source will be cloned.
     
     Raises:
-        ValueError: If the input is neither a valid URL nor a valid path.
+        ValueError: If the input is neither a valid URL nor a valid local path.
     """
     path = os.path.join(os.getcwd(), input)
     print("input: ", input)
     print("path: ", path)
     print("target_dir: ", target_dir)
+
+    # if os.path.isdir(target_dir):
+    #     shutil.rmtree(target_dir)
+    #     print(f"Deleted {target_dir} \n")
 
     if is_valid_url(input):
         os.makedirs(target_dir)
@@ -53,3 +57,32 @@ def clone_source(input: str, target_dir: str) -> None:
         print(f"Copied file into {target_dir} \n")
     else:
         raise ValueError("Input is neither a valid URL nor a valid path.")
+
+
+def copy_py_files(path_source, path_dest):
+    """
+    Copies all Python files from a source directory to a destination directory. It walks through the source
+    directory and its subdirectories, and for each Python file found, it constructs the source and destination
+    file paths and copies the file to the destination. It also creates the destination directory if it doesn't
+    exist. The 'edited_repository' folder is excluded from the analysis.
+    
+    Args:
+        path_source (str): The source directory from where the Python files will be copied.
+        path_dest (str): The destination directory where the Python files will be copied.
+    """
+    # Walk through the source directory and its subdirectories
+    print('copying py files')
+    for root, dirs, files in os.walk(path_source):
+        if 'edited_repository' in dirs:
+            dirs.remove('edited_repository') #exlude 'edited_repository' folder from analysis
+        for file in files:
+            if file.endswith(".py"):  # Check if the file is a Python file
+                # Construct the source and destination file paths
+                source_file = os.path.join(root, file)
+                dest_file = os.path.join(path_dest, os.path.relpath(source_file, path_source))
+
+                # Create the destination directory if it doesn't exist
+                os.makedirs(os.path.dirname(dest_file), exist_ok=True)
+
+                # Copy the file to the destination
+                shutil.copy(source_file, dest_file)

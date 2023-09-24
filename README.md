@@ -12,7 +12,7 @@ To use the `autodoc` tool, follow these steps:
 
 1. Clone or download the `autodoc` repository to your local machine.
 2. Install the required dependencies by running `pip install -r requirements.txt`.
-3. Navigate to the root directory of the `autodoc` repository in your terminal and run main.py (see [example usage](#example-usage)).
+3. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py some_relative_path` (see [example usage](#example-usage)).
 
 ### Command Line Arguments
 
@@ -35,25 +35,35 @@ The `autodoc` tool accepts the following command line arguments:
 To generate and insert docstrings into a repository, run the following command:
 
 ```
-python main.py <source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
+python main.py <relative_source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
 ```
 
-Replace `<source_path>` with the URL/path of the GitHub repository or the directory/file to be analyzed and documented. You can also provide the optional arguments as needed.
+Replace `<relative_source_path>` with the URL/path of the GitHub repository or the relative path to the directory/file to be documented. You can also provide the optional arguments as needed.
 
 ### Example Command
 
 ```
-python main.py https://github.com/example/repo --max_lno 300 --Model gpt-4 --cost expensive --write_gpt_output True --detailed_repo_summary True
+python main.py https://github.com/example/repo
 ```
 
 This command will analyze the repository at the given URL, generate detailed docstrings using the 'gpt-4-32' model, and insert them back into the respective files. It will also write the generated docstrings into a separate file if enabled.
+
+## How the tool works
+
+1. The source is cloned with all files in 'edited_repository'.
+2. All `.md` and `.rst` files are summarized (part of additional info).
+3. All `.py` files are analyzed/edited individually
+   - 3.1 For files with more lines than `max_lno`:
+     File regenerated without any code -> string of only redefined classes and functions with arguments and docstrings are saved with correct insertion (part of additional info).
+   - 3.2 Code of the file and additional info are given to GPT (task: generate docstrings). The GPT response is stored in the `gpt_output` folder.
+   - 3.3 Docstrings are inserted into the code. The code itself is not changed!
 
 ## Notice: 
 
 - I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point. See also the [pricing](https://openai.com/pricing) of openai.
 
    ```
-   python cost_estimator.py <URL or path(folder or file)>
+   python cost_estimator.py <URL or relative_path(folder or file)>
    ```
 
 - If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.
