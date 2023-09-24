@@ -1,7 +1,7 @@
 # Automatic Code Documentation Tool
 
 The `autodoc` repository provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
-It differs from other generation tools by not only analyzing the code of the current function/class, but as much code as possible plus additional information about the repository and the code (if file is too large).
+Autodoc differs from other generation tools by not only analyzing the code of the current function/class, but as much code as possible plus additional information about the repository and the code (if file is too large).
 
 :warning: **Warning:** `gpt-4-32k` is currently not available. Therefore the following default values are currently changed:
 - `--Model:` before: 'gpt-4-32k'; now: 'gpt-4'
