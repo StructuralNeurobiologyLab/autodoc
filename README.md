@@ -21,9 +21,9 @@ The `autodoc` tool accepts the following command line arguments:
 - `source_path` (required): The URL/path of the GitHub repository or the directory/file to be analyzed and documented.
 - `--cost` (optional): The cost of generating the docstrings (further explanation below). Choose between 'expensive' (default) or 'cheap'.
 - `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
-- `--detailed_repo_summary` (optional): Whether to generate a detailed (further explanation below) summary of the repository (by summarizing all .md & .rst files). Choose between True (default) or False.
 - `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. Default is 1200.
 - `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
+- `--detailed_repo_summary` (optional): Whether to generate a detailed (further explanation below) summary of the repository (by summarizing all .md & .rst files). Choose between True (default) or False.
 
 **Further Explanation:**
 
