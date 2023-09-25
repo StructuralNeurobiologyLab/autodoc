@@ -13,7 +13,11 @@ To use the `autodoc` tool, follow these steps:
 
 1. Clone or download the `autodoc` repository to your local machine.
 2. Install the required dependencies by running `pip install -r requirements.txt`.
-3. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py some_relative_path` (see [example usage](#example-usage)).
+3. Create an `config.yaml` in the directory `code` and insert
+   ```
+   api_key: "your_openai_key"
+   ```
+4. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py some_relative_path` (see [example usage](#example-usage)).
 
 ### Command Line Arguments
 
