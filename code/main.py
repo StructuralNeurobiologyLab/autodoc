@@ -8,12 +8,8 @@ from summarize_repo import summarize_repo
 from create_docstrings import create_docstrings
 from insert_docstrings import insert_docstrings
 from gpt_output import show_gpt_output
+from check_config import check_config
 import traceback
-
-
-with open("code/config.yaml", "r") as config_file:
-    config = yaml.safe_load(config_file)
-openai.api_key = config["api_key"]
 
 
 def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = True, detailed_repo_summary: bool = True, max_lno: int = 1200, Model: str = 'gpt-4-32k') -> None:
@@ -40,6 +36,11 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
     Returns:
         None
     """
+
+    # CHECK CONFIG
+    check_config() #and get api_key
+
+
     # PRINT PARAMETERS
     print('Parameters:')
     print(f'    Source path: {source_path}')
@@ -57,7 +58,10 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
         
 
     # INFO ABOUT REPOSITORY
-    info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary)
+    try:
+        info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary)
+    except Exception:
+        info_rep = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=False)
 
 
     # CREATE DOCSTRINGS
