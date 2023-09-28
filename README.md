@@ -17,13 +17,13 @@ To use the `autodoc` tool, follow these steps:
    ```
    api_key: "your_openai_key"
    ```
-4. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py some_relative_path` (see [example usage](#example-usage)).
+4. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py` `path_to_analyze` (see [example usage](#example-usage)).
 
 ### Command Line Arguments
 
 The `autodoc` tool accepts the following command line arguments:
 
-- `source_path` (required): The URL/path of the GitHub repository or the directory/file to be analyzed and documented.
+- `source_path` (required): The URL/path of the GitHub repository or the directory/file (relative or absolute path) to be analyzed and documented.
 - `--cost` (optional): The cost of generating the docstrings (further explanation below). Choose between 'expensive' (default) or 'cheap'.
 - `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
 - `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. Default is 1200.
@@ -40,10 +40,10 @@ The `autodoc` tool accepts the following command line arguments:
 To generate and insert docstrings into a repository, run the following command:
 
 ```
-python main.py <relative_source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
+python main.py <source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
 ```
 
-Replace `<relative_source_path>` with the URL/path of the GitHub repository or the relative path to the directory/file to be documented. You can also provide the optional arguments as needed.
+Replace `<source_path>` with the URL of the GitHub repository or the relative/absolute path to the directory/file to be documented. You can also provide the optional arguments as needed.
 
 ### Example Command
 
@@ -68,7 +68,7 @@ This command will analyze the repository at the given URL, generate detailed doc
 - I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point. See also the [pricing](https://openai.com/pricing) of openai.
 
    ```
-   python cost_estimator.py <URL or relative_path(folder or file)>
+   python cost_estimator.py <URL or path(folder or file)>
    ```
 
 - If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.

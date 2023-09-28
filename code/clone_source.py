@@ -35,9 +35,21 @@ def clone_source(input: str, target_dir: str) -> None:
     Raises:
         ValueError: If the input is neither a valid URL nor a valid local path.
     """
-    path = os.path.join(os.getcwd(), input)
+    def check_path(input):
+        if not os.path.exists(input):
+            rel_path = os.path.join(os.getcwd(), input)
+            return rel_path
+        else:
+            return input
+            
+
+
+
+    path = check_path(input)
+
+
+
     print("input: ", input)
-    print("path: ", path)
     print("target_dir: ", target_dir)
 
     # if os.path.isdir(target_dir):
@@ -50,11 +62,11 @@ def clone_source(input: str, target_dir: str) -> None:
         print(f"Cloned repository into {target_dir} \n")
     elif os.path.isdir(path):
         shutil.copytree(path, target_dir)
-        print(f"Copied folder into {target_dir} \n")
+        print(f"Copied folder {path} into {target_dir} \n")
     elif os.path.isfile(path):
         os.makedirs(target_dir, exist_ok=True)
         shutil.copy(path, target_dir)
-        print(f"Copied file into {target_dir} \n")
+        print(f"Copied file {path} into {target_dir} \n")
     else:
         raise ValueError("Input is neither a valid URL nor a valid path.")
 
