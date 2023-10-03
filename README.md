@@ -13,27 +13,7 @@ To use the `autodoc` tool, follow these steps:
 
 1. Clone or download the `autodoc` repository to your local machine.
 2. Install the required dependencies by running `pip install -r requirements.txt`.
-3. Create an `config.yaml` in the directory `code` and insert
-   ```
-   api_key: "your_openai_key"
-   ```
-4. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py` `path_to_analyze` (see [example usage](#example-usage)).
-
-### Command Line Arguments
-
-The `autodoc` tool accepts the following command line arguments:
-
-- `source_path` (required): The URL/path of the GitHub repository or the directory/file (relative or absolute path) to be analyzed and documented.
-- `--cost` (optional): The cost of generating the docstrings (further explanation below). Choose between 'expensive' (default) or 'cheap'.
-- `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
-- `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. Default is 1200.
-- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
-- `--detailed_repo_summary` (optional): Whether to generate a detailed (further explanation below) summary of the repository (by summarizing all .md & .rst files). Choose between True (default) or False.
-
-**Further Explanation:**
-
-- `cost:` With `expensive`, all files are always edited with the specified `Model`. With `cheap`, all files with fewer lines than `max_lno` are edited with gpt-3.5-turbo-16k, and only the larger files use the given model (e.g., gpt-4).
-- `detailed_repo_summary:` If `True`, then all .md and .rst files are merged at once by gpt. However, if there are many long .md files in the repository, they may have more than 16k tokens in total. Then each .md|.rst file will be summarized separately, and all summaries will be merged again (if set to `False`).
+3. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py` `path_to_analyze` (see [example usage](#example-usage)).
 
 ### Example Usage
 
@@ -62,6 +42,22 @@ This command will analyze the repository at the given URL, generate detailed doc
      File regenerated without any code -> string of only redefined classes and functions with arguments and docstrings are saved with correct insertion (part of additional info).
    - 3.2 Code of the file and additional info are given to GPT (task: generate docstrings). The GPT response is stored in the `gpt_output` folder.
    - 3.3 Docstrings are inserted into the code. The code itself is not changed!
+
+### Command Line Arguments
+
+The `autodoc` tool accepts the following command line arguments:
+
+- `source_path` (required): The URL/path of the GitHub repository or the directory/file (relative or absolute path) to be analyzed and documented.
+- `--cost` (optional): The cost of generating the docstrings (further explanation below). Choose between 'expensive' (default) or 'cheap'.
+- `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
+- `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. Default is 1200.
+- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
+- `--detailed_repo_summary` (optional): Whether to generate a detailed (further explanation below) summary of the repository (by summarizing all .md & .rst files). Choose between True (default) or False.
+
+**Further Explanation:**
+
+- `cost:` With `expensive`, all files are always edited with the specified `Model`. With `cheap`, all files with fewer lines than `max_lno` are edited with gpt-3.5-turbo-16k, and only the larger files use the given model (e.g., gpt-4).
+- `detailed_repo_summary:` If `True`, then all .md and .rst files are merged at once by gpt. However, if there are many long .md files in the repository, they may have more than 16k tokens in total. Then each .md|.rst file will be summarized separately, and all summaries will be merged again (if set to `False`).
 
 ## Notice: 
 

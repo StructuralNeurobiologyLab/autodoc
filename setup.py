@@ -11,6 +11,7 @@ setup(
     entry_points = {
     'console_scripts': [
         'autodoc = mypackage.main:main',
+            #DONT FORGET COST_ESTIMATOR.PY
     ]
 }
 )
