@@ -7,12 +7,12 @@ from clone_source import clone_source, copy_py_files
 from summarize_repo import summarize_repo
 from create_docstrings import create_docstrings
 from insert_docstrings import insert_docstrings
-from gpt_output import show_gpt_output
 from check_config import check_config
+from cost_estimator import cost_estimator
 import traceback
 
 
-def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = True, detailed_repo_summary: bool = True, max_lno: int = 1200, Model: str = 'gpt-4-32k') -> None:
+def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: str) -> None:
     """
     Orchestrates the process of generating and inserting docstrings into a given repository.
     
@@ -36,6 +36,21 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
     Returns:
         None
     """
+    # CHECK INPUT
+    if max_lno == None:
+        if Model == 'gpt-4-32k':
+            max_lno = 1200
+        elif Model == 'gpt-4':
+            max_lno = 300
+
+    # CLONE SOURCE
+    target_dir = os.path.join(os.getcwd(), "edited_repository")
+    clone_source(source_path, target_dir)
+    path_dest = os.path.join(target_dir, 'gpt_output') #path to the gpt_output folder
+
+    # ESTIMATE COSTS
+    detailed_repo_summary = cost_estimator(max_lno = max_lno, target_dir = target_dir, model = Model, cost = cost) #also checks if combinded .md/.rst files are too long for gpt-3.5-16k
+
 
     # CHECK CONFIG
     check_config() #and get api_key
@@ -49,19 +64,13 @@ def main(source_path: str, cost: str = 'expensive', write_gpt_output: bool = Tru
     print(f'    detailed analysis/summary of repository: {detailed_repo_summary}')
     print(f'    max. snippet length: {max_lno} lines')
     print(f'    Model: {Model}')
-
-
-    # CLONE SOURCE
-    target_dir = os.path.join(os.getcwd(), "edited_repository")
-    clone_source(source_path, target_dir)  # returns 'file' if input is a file
-    path_dest = os.path.join(target_dir, 'gpt_output') #path to the gpt_output folder
         
 
     # INFO ABOUT REPOSITORY
     try:
         info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary)
     except Exception:
-        info_rep = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=False)
+        info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=False)
 
 
     # CREATE DOCSTRINGS
@@ -110,8 +119,7 @@ if __name__ == "__main__":
     # Optional arguments
     parser.add_argument("--cost", type=str, default='expensive', help="('expensive'/'cheap'); expensive: always uses gpt-4-32k; cheap: uses gpt-3.5-turbo-16k for files < 300 lines and gpt-4-32k for files > 300 lines")
     parser.add_argument("--write_gpt_output", dest='write_gpt_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); writes the GPT output/docstrings into a folder 'gpt-output' within the folder eddited repository ")
-    parser.add_argument("--detailed_repo_summary", dest='detailed_repo_summary', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); True: all .md|.rst files are combined into a single string and fed into the gptAPI (may be too long for gpt -> False); False: each .md|.rst file is summarized individually and the summaries are combined into a final summary")
-    parser.add_argument("--max_lno", type=int, default=300, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
+    parser.add_argument("--max_lno", type=int, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
     parser.add_argument("--Model", type=str, default='gpt-4', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
 
     args = parser.parse_args()
@@ -120,7 +128,6 @@ if __name__ == "__main__":
         args.source_path,
         cost=args.cost,
         write_gpt_output=args.write_gpt_output,
-        detailed_repo_summary=args.detailed_repo_summary,
         max_lno=args.max_lno,
         Model=args.Model
     )

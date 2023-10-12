@@ -123,7 +123,7 @@ def create_docstrings(file_path: str, gpt_path: str, additional_info: str = None
         return docstrings
 
     elif no_lines > max_lno:
-        print('analyzing file by splitting it into snippets: ', file_path)
+        print(f'analyzing file by splitting it into snippets (Model: {Model}): ', file_path)
 
         info_file = f'info about file: \n{code_info(file_path)}'
         info = (additional_info + '\n' + info_file) if additional_info else info_file

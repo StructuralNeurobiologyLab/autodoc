@@ -1,6 +1,7 @@
 import os
 import shutil
 import urllib.request
+import sys
 from git import Repo
 
 
@@ -21,44 +22,46 @@ def is_valid_url(url: str) -> bool:
     except Exception:
         return False
 
-def clone_source(input: str, target_dir: str) -> None:
+def clone_source(source_path: str, target_dir: str) -> None:
     """
     Clones a source from a given input (URL or local path) into a target directory. If the input is a valid
-    URL, it clones the repository into the target directory. If the input is a valid local directory, it copies
+    URL, it clones the repository into the target directory. If the source is a valid local directory, it copies
     the directory into the target directory. If the input is a valid local file, it copies the file into the
     target directory. If the input is neither a valid URL nor a valid local path, it raises a ValueError.
     
     Args:
-        input (str): The input source to be cloned. It can be a URL or a local path.
+        source_path (str): The input source to be cloned. It can be a URL or a local path.
         target_dir (str): The target directory where the source will be cloned.
     
     Raises:
-        ValueError: If the input is neither a valid URL nor a valid local path.
+        ValueError: If source_path is neither a valid URL nor a valid local path.
     """
-    def check_path(input):
-        if not os.path.exists(input):
-            rel_path = os.path.join(os.getcwd(), input)
+
+    if os.path.isdir(target_dir):
+        confirmation = input(f"The path {target_dir} already exists. Do you want to delete it and continue? (yes[y]/no[n]): ")
+
+        if confirmation.lower() in ("yes", 'y'):
+            shutil.rmtree(target_dir) # delete the already existing folder
+            print(f"Deleted {target_dir} \n")
+        else:
+            print("Program terminated.")
+            sys.exit(0)
+
+    def check_path(source_path):
+        if not os.path.exists(source_path):
+            rel_path = os.path.join(os.getcwd(), source_path)
             return rel_path
         else:
-            return input
-            
+            return source_path
 
+    path = check_path(source_path)
 
-
-    path = check_path(input)
-
-
-
-    print("input: ", input)
+    print("input: ", source_path)
     print("target_dir: ", target_dir)
 
-    # if os.path.isdir(target_dir):
-    #     shutil.rmtree(target_dir)
-    #     print(f"Deleted {target_dir} \n")
-
-    if is_valid_url(input):
+    if is_valid_url(source_path):
         os.makedirs(target_dir)
-        Repo.clone_from(input, target_dir)
+        Repo.clone_from(source_path, target_dir)
         print(f"Cloned repository into {target_dir} \n")
     elif os.path.isdir(path):
         shutil.copytree(path, target_dir)
@@ -71,7 +74,7 @@ def clone_source(input: str, target_dir: str) -> None:
         raise ValueError("Input is neither a valid URL nor a valid path.")
 
 
-def copy_py_files(path_source, path_dest):
+def copy_py_files(path_source, path_dest):  #currently not needed
     """
     Copies all Python files from a source directory to a destination directory. It walks through the source
     directory and its subdirectories, and for each Python file found, it constructs the source and destination
