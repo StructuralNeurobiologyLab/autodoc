@@ -10,8 +10,7 @@ setup(
     install_requires = install_requires,
     entry_points = {
     'console_scripts': [
-        'autodoc = mypackage.main:main',
-            #DONT FORGET COST_ESTIMATOR.PY
+        'autodoc = code.main:main',
     ]
 }
 )

@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# autodoc - automatic documentation for Python code
+#
+# Copyright (c) 2023 - now
+# Max-Planck-Institute of biological Intelligence, Munich, Germany
+# Authors: Karl Heggenberger, Joergen Kornfeld
+
 import openai
 
 
