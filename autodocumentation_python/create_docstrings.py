@@ -7,9 +7,9 @@
 
 import ast
 import os
-from gptapi import gptapi
-from summarize_file import code_info, node_info
-from make_snippets import make_snippets
+from autodocumentation_python.gptapi import gptapi
+from autodocumentation_python.summarize_file import code_info, node_info
+from autodocumentation_python.make_snippets import make_snippets
 
 
 def class_or_func_present(code):

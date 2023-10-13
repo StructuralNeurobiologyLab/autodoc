@@ -11,10 +11,11 @@ def read_readme():
     return readme
 
 setup(
-    name = 'autodoc_pyfiles',
-    version = '0.1',
+    name = 'autodocumentation_python',
+    version = '1.2',
     description='Automated documentationstring generation for python files within repositories, folders or for sinlge .py files.',
     long_description=read_readme(),
+    long_description_content_type='text/markdown',
     url='https://github.com/StructuralNeurobiologyLab/autodoc',
     download_url='https://github.com/StructuralNeurobiologyLab/autodoc',
     author='Karl Heggenberger, Joergen Kornfeld.',
@@ -23,7 +24,7 @@ setup(
     install_requires = install_requires,
     entry_points = {
     'console_scripts': [
-        'autodoc = code.main:main',
+        'autodoc = autodocumentation_python.main:execute',
     ]
 }
 )

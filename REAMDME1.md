@@ -1,6 +1,6 @@
 # Automatic Code Documentation Tool
 
-The `autodocumentation_python` (`autodoc`) package provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
+The `autodoc` repository provides a tool for automatically generating detailed Google format docstrings for each function and class in a given Python file. The tool utilizes the GPT (Generative Pre-trained Transformer) API provided by OpenAI to generate the docstrings. It also includes functionality to handle large files by splitting them into smaller snippets and generating docstrings for each snippet separately.
 Autodoc differs from other generation tools by not only analyzing the code of the current function/class, but as much code as possible plus additional information about the repository and the code (if file is too large).
 
 :warning: **Warning:** `gpt-4-32k` is currently not available. Therefore the following default value is currently changed:
@@ -10,21 +10,16 @@ Autodoc differs from other generation tools by not only analyzing the code of th
 
 To use the `autodoc` tool, follow these steps:
 
-1. Install `autodocumentation_python` using pip
-```
-pip install autodocumentation_python
-```
-2. Run the package using `autodoc` and the `path_to_analyze` - URL of repository or path of folder|file you want to analyze (see [example usage](#example-usage)).
-```
-autodoc path|URL_to_anlyze
-```
+1. Clone or download the `autodoc` repository to your local machine.
+2. Install the required dependencies by running `pip install -r requirements.txt`.
+3. Navigate to the root directory of the `autodoc` repository in your terminal and run `code/main.py` `path_to_analyze` (see [example usage](#example-usage)).
 
 ### Example Usage
 
 To generate and insert docstrings into a repository, run the following command:
 
 ```
-autodoc <source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
+python main.py <source_path> [--cost <cost>] [--write_gpt_output <write_gpt_output>] [--detailed_repo_summary <detailed_repo_summary>] [--max_lno <max_lno>] [--Model <Model>]
 ```
 
 Replace `<source_path>` with the URL of the GitHub repository or the relative/absolute path to the directory/file to be documented. You can also provide the optional arguments as needed.
@@ -32,7 +27,7 @@ Replace `<source_path>` with the URL of the GitHub repository or the relative/ab
 ### Example Command
 
 ```
-autodoc https://github.com/example/repo
+python main.py https://github.com/example/repo
 ```
 
 This command will analyze the repository at the given URL, generate detailed docstrings using the 'gpt-4-32' model, and insert them back into the respective files. It will also write the generated docstrings into a separate file if enabled.
@@ -40,9 +35,8 @@ This command will analyze the repository at the given URL, generate detailed doc
 ## How the tool works
 
 1. The source is cloned with all files in 'edited_repository'.
-2. The price of editing the specified source_path is estimated ()
-3. All `.md` and `.rst` files are summarized (part of additional info).
-4. All `.py` files are analyzed/edited individually
+2. All `.md` and `.rst` files are summarized (part of additional info).
+3. All `.py` files are analyzed/edited individually
    - 3.1 For files with more lines than `max_lno`:
      File regenerated without any code -> string of only redefined classes and functions with arguments and docstrings are saved with correct insertion (part of additional info).
    - 3.2 Code of the file and additional info are given to GPT (task: generate docstrings). The GPT response is stored in the `gpt_output` folder.
@@ -54,11 +48,17 @@ The `autodoc` tool accepts the following command line arguments:
 
 - `source_path` (required): The URL/path of the GitHub repository or the directory/file (relative or absolute path) to be analyzed and documented.
 - `--cost` (optional): With `expensive`, all files are always edited with the specified `Model`. With `cheap`, all files with fewer lines than `max_lno` are edited with gpt-3.5-turbo-16k, and only the larger files use the given model (e.g., gpt-4).
-- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
 - `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
-- `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. It is not necessary to specify this number, since we have default values based on your input of `Model`
+- `--max_lno` (optional): The maximum number of lines from which a code is split into snippets.
+- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
 
 ## Notice: 
+
+- I have written a small program that roughly estimates the costs. It is based on the calculation explained in this last bullet point. See also the [pricing](https://openai.com/pricing) of openai.
+
+   ```
+   python cost_estimator.py <URL or path(folder or file)>
+   ```
 
 - If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.
 
@@ -66,8 +66,8 @@ The `autodoc` tool accepts the following command line arguments:
 
 - The larger the maximum input to the model, the more code can be processed at once. As a result, (we think!) GPT understands the code better and can generate more accurate docstrings. For optimal docstrings it is therefore recommended to select the largest possible model (gpt-4-32k) and to set the maximum code length (max_lno) as high as possible(~1500). <br>
 max_lno can be roughly estimated: <br>
-   One token is roughly 4 characters and 0.75 English words. One line of code has roughly 20 tokens. <br>
    max_lno = (max_model_tokens - info_repo_tokens - info_code_tokens) : 20 <br>
+   One token is roughly 4 characters and 0.75 English words. One line of code has roughly 20 tokens. <br>
    If calculated very generously: Info_repo = (2000 tokens|1500 words), info_code = (4000 tokens|3000 words) and we use gpt-4-32k then <br>
    max_lno = (32k - 2k - 4k) : 20 = 1300 [lines].
 

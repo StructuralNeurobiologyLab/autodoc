@@ -10,12 +10,12 @@ from distutils.util import strtobool
 import os
 import openai
 import yaml
-from clone_source import clone_source, copy_py_files
-from summarize_repo import summarize_repo
-from create_docstrings import create_docstrings
-from insert_docstrings import insert_docstrings
-from check_config import check_config
-from cost_estimator import cost_estimator
+from autodocumentation_python.clone_source import clone_source, copy_py_files
+from autodocumentation_python.summarize_repo import summarize_repo
+from autodocumentation_python.create_docstrings import create_docstrings
+from autodocumentation_python.insert_docstrings import insert_docstrings
+from autodocumentation_python.check_config import check_config
+from autodocumentation_python.cost_estimator import cost_estimator
 import traceback
 
 
@@ -116,8 +116,10 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
     print('You can see your edited repository in the folder "edited_repository" of your current working directory')
 
 
-
-if __name__ == "__main__":
+def execute():
+    """
+    An helper function to parse the command line arguments and call the main function. This is needed because of pip-packaging.
+    """
     parser = argparse.ArgumentParser(description="Process repositories/folder/files and optional variables.")
     
     # Positional argument
@@ -138,3 +140,6 @@ if __name__ == "__main__":
         max_lno=args.max_lno,
         Model=args.Model
     )
+
+if __name__ == "__main__":
+    execute()

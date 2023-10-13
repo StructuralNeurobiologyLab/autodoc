@@ -2,4 +2,8 @@ __pycache__/
 ToDo.txt
 gen_Readme.py
 edited_repository
+dist/
+build/
+autodocumentation_python.egg-info/
+README1.md
 

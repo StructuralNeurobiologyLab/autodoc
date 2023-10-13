@@ -1,3 +1,4 @@
 openai
 astunparse
 GitPython
+pyyaml
