@@ -39,7 +39,7 @@ This command will analyze the repository at the given URL, generate detailed doc
 
 ## How the tool works
 
-1. The source is cloned with all files in 'edited_repository'.
+1. The source is cloned with all files in 'edited_repository'. (If you have large data files, you might create a new folder containing only .py, .md and .rst files)
 2. The price of editing the specified source_path is estimated ()
 3. All `.md` and `.rst` files are summarized (part of additional info).
 4. All `.py` files are analyzed/edited individually
