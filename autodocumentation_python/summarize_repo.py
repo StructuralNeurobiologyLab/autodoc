@@ -28,7 +28,7 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
         str: The generated summary of the repository. If no additional information about the environment 
              in which the file is embedded is found, None is returned.
     """
-    print('Summarizing repository using .rst and .md files ...')
+    print('\nSummarizing repository using .rst and .md files ...')
     if detailed:
         all_content = []
         for root, _, files in os.walk(file_path):
@@ -45,12 +45,12 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
             return None
 
         command = """
-            Generate a very detailed summary for this repository. It is later used 
-            to provide additional information when analyzing the code to 
-            generate docstrings using the gptAPI. Focus especially on the methodologies.
-            The summary should contain maximum information about the repository but should not be longer than 1000 tokens.
-            Just output the summary.
-            """
+Generate a very detailed summary for this repository. It is later used 
+to provide additional information when analyzing the code to 
+generate docstrings using the gptAPI. Focus especially on the methodologies.
+The summary should contain maximum information about the repository but should not be longer than 1000 tokens.
+Just output the summary.
+"""
         response = openai.ChatCompletion.create(
             model=Model,
             messages=[
@@ -74,9 +74,7 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
                     with open(file_path, "r") as file:
                         content = file.read()
                     
-                    command = """
-                    Generate a detailed summary for this file. Just output the summary.
-                    """
+                    command = """Generate a detailed summary for this file. Just output the summary."""
                     response = openai.ChatCompletion.create(
                         model=Model,
                         messages=[
@@ -95,11 +93,11 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
             return None
         
         command = """
-            Generate a detailed summary for this repository. It is later used 
-            to provide additional information when analyzing the code to 
-            generate docstrings using the gptAPI.
-            Just output the summary.
-            """
+Generate a detailed summary for this repository. It is later used 
+to provide additional information when analyzing the code to 
+generate docstrings using the gptAPI.
+Just output the summary.
+"""
         response = openai.ChatCompletion.create(
             model=Model,
             messages=[

@@ -9,6 +9,9 @@ import re
 import os
 import ast
 import astunparse
+import traceback
+from autodocumentation_python.gptapi import gpt_compare
+from autodocumentation_python.check_config import check_config
 
 def shift_docstring(docstring, indent):
     """
@@ -32,7 +35,7 @@ def shift_docstring(docstring, indent):
     return shifted_docstring
 
 
-def remove_start_end_lines(docstrings):
+def remove_start_end_lines(docstrings: str):
     """
     Removes the start and end lines from a code string.
     
@@ -106,7 +109,15 @@ def get_name_args(node):
             args = f"{astunparse.unparse(node.args).strip()}"
         if isinstance(node, ast.ClassDef):
             bases = [base for base in node.bases]
-            args = f"{', '.join([base.id for base in bases])}" if bases else ''
+            #args = f"{', '.join([base.id for base in bases])}" if bases else ''
+            
+            try:
+                args = f"{', '.join([base.id for base in bases])}" if bases else ''
+            except AttributeError:
+                try:
+                    args = f"{', '.join([base.value.id for base in bases])}" if bases else ''
+                except AttributeError:
+                    args = ''
     return name, args
 
 def find_end_of_definition(code_lines, node):
@@ -160,7 +171,7 @@ def insert_docstrings(file_path, docstrings):
     tree_code = ast.parse(code)
     for node in ast.walk(tree_code):
         if isinstance(node, (ast.ClassDef, ast.FunctionDef)):
-            numb_nodes_code.append(node)
+            numb_nodes_code.append(node.name)
 
     tree_doc = ast.parse(docstrings)
     assign_parent_to_nodes(tree_doc) #make .parent attribute for nodes in docstring ast
@@ -169,20 +180,21 @@ def insert_docstrings(file_path, docstrings):
         if isinstance(node_doc, (ast.ClassDef, ast.FunctionDef)):
             numb_node_doc.append(node_doc)
             try:
-                insert_1_docstring(node_doc, tree_doc, file_path) #insert docstring one by one into the code
-                numb_inserted_nodes.append(node_doc)
+                inserted_node = insert_1_docstring(node_doc, tree_doc, file_path) #insert docstring one by one into the code
+                if inserted_node:
+                    numb_inserted_nodes.append(inserted_node)
             except AttributeError:
                 print(f'insertion did not work for node: {node_doc.name}, {node_doc}')
+                traceback.print_exc()
 
     not_inserted = [node.name for node in numb_node_doc if node not in numb_inserted_nodes]
-    #not_generated = [node.name for node in numb_nodes_code if node not in numb_node_doc]   #the nodes are from different trees -> not comparable/identical
-    print(f'    {len(numb_nodes_code)} new classes/functions in original file')
-    print(f'    {len(numb_node_doc)} docstrings generated (# of classes/functions in gpt_output)')
-    if not_inserted:
-        print('    '*2+f'-> not inserted: {", ".join(not_inserted)}')
+    not_generated = [node for node in numb_nodes_code if node not in [node.name for node in numb_node_doc]]   #the nodes are from different trees -> not comparable/identical
+    if len(numb_inserted_nodes) != len(numb_nodes_code):
+        print(f'    {len(numb_nodes_code)} new classes/functions in original file')
+        print(f'    {len(numb_node_doc)} docstrings generated (can be found in gpt_output)')
+        print(f'    {len(not_generated)} docstrings not generated: {", ".join(not_generated)}')
+        print(f'    {len(not_inserted)} of generated {len(numb_node_doc)} docstrings not inserted: {", ".join(not_inserted)}')
     print(f' -> {len(numb_inserted_nodes)}/{len(numb_nodes_code)} docstrings generated and inserted')
-    # if not_generated:
-    #     print('    '*2+f'-> not generated: {", ".join(not_generated)}')
 
 
 def insert_1_docstring(node_doc, tree_doc, file_path):
@@ -213,29 +225,45 @@ def insert_1_docstring(node_doc, tree_doc, file_path):
 
     for node_code in ast.walk(tree_code):
         if isinstance(node_code, (ast.ClassDef, ast.FunctionDef)):
-            try:
-                name_doc, args_doc = get_name_args(node_doc)
-                name_code, args_code = get_name_args(node_code)
-                parents_code = find_parent_nodes(node_code, tree_code)
-                if name_code == name_doc and args_code == args_doc and parents_doc == parents_code:
-                    docstring = ast.get_docstring(node_doc)
-                    if ast.get_docstring(node_code) is not None:
-                        start = node_code.body[0].__dict__['lineno'] #start line of old docstring
-                        end = node_code.body[0].__dict__['end_lineno'] #end line of old docstring
-                        for i in range(end-start+1):
-                            del lines_code[start-1] #delete old docstring
-                        indent = node_code.body[0].col_offset
-                        shifted_docstring = shift_docstring(docstring, indent)
-                        lines_code.insert(start-1, shifted_docstring)
-                    if ast.get_docstring(node_code) is None:
-                        start = find_end_of_definition(lines_code, node_code) - 1
-                        indent = node_code.body[0].col_offset
-                        shifted_docstring = shift_docstring(docstring, indent)
-                        lines_code.insert(start, shifted_docstring)
-            except AttributeError:
-                pass
-        
-
-    with open(file_path, "w") as file:
-        file.truncate()
-        file.write(''.join(lines_code))
+            name_doc, args_doc = get_name_args(node_doc)
+            name_code, args_code = get_name_args(node_code)
+            parents_code = find_parent_nodes(node_code, tree_code)
+            if name_code == name_doc and args_code == args_doc and parents_doc == parents_code:
+                docstring = ast.get_docstring(node_doc)
+                if ast.get_docstring(node_code) is not None:
+                    docstring = remove_start_end_lines(compare_docstrings(ast.get_docstring(node_code), docstring)).strip()
+                    start = node_code.body[0].__dict__['lineno'] #start line of old docstring
+                    end = node_code.body[0].__dict__['end_lineno'] #end line of old docstring
+                    for i in range(end-start+1):
+                        del lines_code[start-1] #delete old docstring
+                    indent = node_code.body[0].col_offset
+                    shifted_docstring = shift_docstring(docstring, indent)
+                    lines_code.insert(start-1, shifted_docstring)
+                elif ast.get_docstring(node_code) is None:
+                    start = find_end_of_definition(lines_code, node_code) - 1
+                    indent = node_code.body[0].col_offset
+                    shifted_docstring = shift_docstring(docstring, indent)
+                    lines_code.insert(start, shifted_docstring)
+                with open(file_path, "w") as file:
+                    file.truncate()
+                    file.write(''.join(lines_code))
+                return node_doc
+    return None
+   
+def compare_docstrings(old_docstring, new_docstring):
+    if old_docstring.strip() == new_docstring.strip():
+        return new_docstring
+    else:
+        command = f"""
+I want to update an old docstring to a new one generated by GPT. Compare these two and if there is any
+information in the old one that is not in the new one, add it to the new one. If there is no difference,
+just return the new docstring - no further notification. Maximal 90 characters per line. 
+Your output whould start with "start" and end with "end".
+old docstring:
+{old_docstring}
+new docstring:
+{new_docstring}
+"""
+        edited_docstring = gpt_compare(command, Model='gpt-4')
+        return edited_docstring
+    

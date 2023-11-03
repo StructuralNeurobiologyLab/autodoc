@@ -32,7 +32,7 @@ def gptapi(code: str, command: str, Model: str, additional_info: str = None,
     """
 
     messages = [
-        {"role": "system", "content": "We aim to edit a repository with Google docstrings."},
+        {"role": "system", "content": "We aim to edit the docstrings of a repository."},
         {"role": "user", "content": command},
         {"role": "user", "content": f"code to be edited:\n{code}"},
     ]
@@ -40,6 +40,23 @@ def gptapi(code: str, command: str, Model: str, additional_info: str = None,
     if additional_info is not None:
         full_additional_info = f"additional_info: \n {additional_info} \nend of additional_info"
         messages.insert(2, {"role": "user", "content": full_additional_info})
+
+    response = openai.ChatCompletion.create(
+        model=Model,
+        messages=messages,
+        temperature=temperature,
+    )
+    answer = response['choices'][0]['message']['content']
+
+    return answer
+
+
+def gpt_compare(command: str, Model: str,temperature: float = 0.2):
+
+    messages = [
+        {"role": "system", "content": "We aim to edit the docstrings of a repository."},
+        {"role": "user", "content": command},
+    ]
 
     response = openai.ChatCompletion.create(
         model=Model,

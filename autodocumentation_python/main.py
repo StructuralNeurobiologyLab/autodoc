@@ -64,7 +64,7 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
 
     # PRINT PARAMETERS
-    print('Parameters:')
+    print('\n\nParameters:')
     print(f'    Source path: {source_path}')
     print(f'    cost: {cost}')
     print(f'    write gpt output: {write_gpt_output}')
@@ -97,6 +97,7 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
                 # inserts docstrings
                 try:
+                    print('    Compare docstrings to old ones (GPT) and insert them...')
                     insert_docstrings(file_path, docstrings) 
                 except Exception as err:
                     print(f'    Error: {err}')

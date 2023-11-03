@@ -43,10 +43,10 @@ This command will analyze the repository at the given URL, generate detailed doc
 2. The price of editing the specified source_path is estimated ()
 3. All `.md` and `.rst` files are summarized (part of additional info).
 4. All `.py` files are analyzed/edited individually
-   - 3.1 For files with more lines than `max_lno`:
+   - 4.1 For files with more lines than `max_lno`:
      File regenerated without any code -> string of only redefined classes and functions with arguments and docstrings are saved with correct insertion (part of additional info).
-   - 3.2 Code of the file and additional info are given to GPT (task: generate docstrings). The GPT response is stored in the `gpt_output` folder.
-   - 3.3 Docstrings are inserted into the code. The code itself is not changed!
+   - 4.2 Code of the file and additional info are given to GPT (task: generate docstrings). The GPT response is stored in the `gpt_output` folder.
+   - 4.3 Each generated docstring is compared to its old one (if present) to ensure no loss of information. Then the new docstring is inserted into the code. The code itself is not changed!
 
 ### Command Line Arguments
 
