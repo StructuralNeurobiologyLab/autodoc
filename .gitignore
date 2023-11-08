@@ -6,4 +6,5 @@ dist/
 build/
 autodocumentation_python.egg-info/
 README1.md
+data/
 

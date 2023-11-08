@@ -49,6 +49,10 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
             max_lno = 1200
         elif Model == 'gpt-4':
             max_lno = 300
+        elif Model == 'gpt-4-1106-preview':
+            max_lno = 300
+        else:
+            max_lno = 300
 
     # CLONE SOURCE
     target_dir = os.path.join(os.getcwd(), "edited_repository")
@@ -97,8 +101,8 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
                 # inserts docstrings
                 try:
-                    print('    Compare docstrings to old ones (GPT) and insert them...')
-                    insert_docstrings(file_path, docstrings) 
+                    print('    Compare docstrings to old ones and insert them...')
+                    insert_docstrings(file_path, docstrings, Model) 
                 except Exception as err:
                     print(f'    Error: {err}')
                     traceback.print_exc()
