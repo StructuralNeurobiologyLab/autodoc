@@ -54,7 +54,7 @@ The `autodoc` tool accepts the following command line arguments:
 
 - `source_path` (required): The URL/path of the GitHub repository or the directory/file (relative or absolute path) to be analyzed and documented.
 - `--cost` (optional): With `expensive`, all files are always edited with the specified `Model`. With `cheap`, all files with fewer lines than `max_lno` are edited with gpt-3.5-turbo-16k, and only the larger files use the given model (e.g., gpt-4).
-- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default) or 'gpt-4'.
+- `--Model` (optional): The GPT model used for docstring generation. Choose between 'gpt-4-32k' (default), 'gpt-4' or 'gpt-4-1106-preview'(new and not best performance).
 - `--write_gpt_output` (optional): Whether to write the GPT output/docstrings into a folder 'gpt-output' within the 'edited_repository' folder. Choose between True (default) or False.
 - `--max_lno` (optional): The maximum number of lines from which a code is split into snippets. It is not necessary to specify this number, since we have default values based on your input of `Model`
 
@@ -62,7 +62,7 @@ The `autodoc` tool accepts the following command line arguments:
 
 - If you get errors for individual files, the docstrings were most likely generated anyway, but could not be inserted into the code (formatting problems in the gpt response). Under `edited_repository/gpt_output` should be the file with generated docstrings. For a quick fix you can insert them by hand.
 
-- The analysis of the .md and .rst files (summarize_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 72)
+- The analysis of the .md and .rst files (summarize_repo.py) is currently only done with gpt-3.5-turbo-16k. (The model can be changed in main.py in line 82)
 
 - The larger the maximum input to the model, the more code can be processed at once. As a result, (we think!) GPT understands the code better and can generate more accurate docstrings. For optimal docstrings it is therefore recommended to select the largest possible model (gpt-4-32k) and to set the maximum code length (max_lno) as high as possible(~1500). <br>
 max_lno can be roughly estimated: <br>
@@ -82,7 +82,7 @@ The `autodoc` repository contains the following files:
 - `make_snippets.py`: Contains the `make_snippets` function, which generates code snippets from a file based on the maximum number of lines.
 - `summarize_repo.py`: Contains the `summarize_repo` function, which analyzes a repository and generates a summary using the gptAPI.
 - `clone_source.py`: Contains the `clone_source` function, which clones or copies the source code to the target directory.
-- `insert_docstrings.py`: Contains the `insert_docstrings` function, which inserts docstrings into a Python file at the appropriate locations.
+- `insert_docstrings.py`: Contains the `insert_docstrings` function, which inserts docstrings into a Python file at the appropriate locations after comparing them to the corresponding old docstring.
 - `summarize_file.py`: Contains the `gen_shifted_docstring` and `node_info` functions, which extract the definition and docstring of a class or function from an abstract syntax tree node.
 - `README.md`: The README file for the `autodoc` repository.
 
