@@ -5,6 +5,7 @@
 # Max-Planck-Institute of biological Intelligence, Munich, Germany
 # Authors: Karl Heggenberger, Joergen Kornfeld
 
+import sys
 import argparse
 from distutils.util import strtobool
 import os
@@ -19,7 +20,7 @@ from autodocumentation_python.cost_estimator import cost_estimator
 import traceback
 
 
-def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: str) -> None:
+def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: str, summarize_repository) -> None:
     """
     Orchestrates the process of generating and inserting docstrings into a given repository.
     
@@ -44,6 +45,17 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
         None
     """
     # CHECK INPUT
+
+    # if save_terminal_output:
+    #     output_file_path = 'terminal_output.txt'
+    #     output_file = open(output_file_path, 'w')
+    #     # Save the current standard output and error streams
+    #     original_stdout = sys.stdout
+    #     original_stderr = sys.stderr
+    #     # Redirect standard output and error to the file
+    #     sys.stdout = output_file
+    #     sys.stderr = output_file
+
     if max_lno == None:
         if Model == 'gpt-4-32k':
             max_lno = 1200
@@ -72,17 +84,17 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
     print(f'    Source path: {source_path}')
     print(f'    cost: {cost}')
     print(f'    write gpt output: {write_gpt_output}')
-    print(f'    detailed analysis/summary of repository: {detailed_repo_summary}')
+    print(f'    summarize .md & .rst files: {summarize_repository}')
     print(f'    max. snippet length: {max_lno} lines')
     print(f'    Model: {Model}')
-        
+
 
     # INFO ABOUT REPOSITORY
     try:
-        info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=detailed_repo_summary)
+        info_repo = summarize_repo(target_dir, summarize_repository, Model='gpt-4-1106-preview', detailed=detailed_repo_summary)
     except Exception:
-        info_repo = summarize_repo(target_dir, Model='gpt-3.5-turbo-16k', detailed=False)
-
+        info_repo = summarize_repo(target_dir, summarize_repository, Model='gpt-3.5-turbo-16k', detailed=False)
+    
 
     # CREATE DOCSTRINGS
     print('\nAnalyzing files:')
@@ -119,6 +131,15 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
     print('\nFinished!')
     print('You can see your edited repository in the folder "edited_repository" of your current working directory')
+    # if save_terminal_output:
+    #     # Reset the standard output and error streams
+    #     sys.stdout = original_stdout
+    #     sys.stderr = original_stderr
+    #     # Close the file
+    #     output_file.close()
+    #     print(f'The terminal output was saved in the file {output_file_path} in the folder "edited_repository" of your cwd')
+
+
 
 
 def execute():
@@ -135,6 +156,8 @@ def execute():
     parser.add_argument("--write_gpt_output", dest='write_gpt_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); writes the GPT output/docstrings into a folder 'gpt-output' within the folder eddited repository ")
     parser.add_argument("--max_lno", type=int, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
     parser.add_argument("--Model", type=str, default='gpt-4', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
+    parser.add_argument("--summarize_repository", dest='summarize_repository', type=lambda x: bool(strtobool(x)), default=False, help="(True/False); generates a detailed summary of all .md & .rst files of the repository")
+    #parser.add_argument("--save_terminal_output", dest='save_terminal_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); saves the terminal output in a file 'terminal_output.txt' in the folder 'edited_repository'")
 
     args = parser.parse_args()
     
@@ -143,7 +166,9 @@ def execute():
         cost=args.cost,
         write_gpt_output=args.write_gpt_output,
         max_lno=args.max_lno,
-        Model=args.Model
+        Model=args.Model,
+        summarize_repository=args.summarize_repository,
+        #save_terminal_output=args.save_terminal_output,
     )
 
 if __name__ == "__main__":

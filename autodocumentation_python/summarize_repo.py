@@ -8,7 +8,7 @@
 import openai
 import os
 
-def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: bool = True) -> str:
+def summarize_repo(file_path: str, summarize_repository, Model: str = 'gpt-3.5-turbo-16k', detailed: bool = True) -> str:
     """
     Analyzes a repository and generates a summary using the GPT API.
     
@@ -28,6 +28,8 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
         str: The generated summary of the repository. If no additional information about the environment 
              in which the file is embedded is found, None is returned.
     """
+    if not summarize_repository:
+        return None
     print('\nSummarizing repository using .rst and .md files ...')
     if detailed:
         all_content = []
@@ -45,10 +47,11 @@ def summarize_repo(file_path: str, Model: str = 'gpt-3.5-turbo-16k', detailed: b
             return None
 
         command = """
-Generate a very detailed summary for this repository. It is later used 
-to provide additional information when analyzing the code to 
-generate docstrings using the gptAPI. Focus especially on the methodologies.
-The summary should contain maximum information about the repository but should not be longer than 1000 tokens.
+Generate a very detailed summary for this repository given its documentation. 
+Focus especially on details in the methodologies.
+It is later used to provide additional information when analyzing the repository`s code to 
+generate docstrings using the gptAPI. 
+The summary should not be longer than 1000 tokens or 750 words.
 Just output the summary.
 """
         response = openai.ChatCompletion.create(

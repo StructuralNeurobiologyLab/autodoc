@@ -76,8 +76,6 @@ def cost_estimator(max_lno: int, target_dir: str, model, cost):
     # print(f"Total words in .rst and .md files: {total_words} -> {total_words * 1.25} tokens (< 16k tokens!!! else detailed == False)")
     # print(f"Number of files with more than {max_lno} lines: {num_files_above_max}")
     # print(f"Total lines in files above {max_lno} lines: {lines_above_max} -> {lines_above_max * 20} tokens (with gpt4)")
-    #     
-    max_lno = 300
     
     #calculate for gpt4-32k (max_lno can be chooses freely (1200 is the default))
     total_lines, total_words, num_files_above_max, lines_above_max = count_code_and_words(target_dir, max_lno)
@@ -113,7 +111,7 @@ def cost_estimator(max_lno: int, target_dir: str, model, cost):
         sys.exit(0)
 
 
-    if total_words * 1.25 < 16000:
+    if total_words * 1.25 < 120000:
         detailed_repo_summary = True
     else:
         detailed_repo_summary = False

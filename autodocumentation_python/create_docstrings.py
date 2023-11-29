@@ -139,22 +139,41 @@ Just print out the source code with the generated docstrings.
         command = '''
 For the given python file below "code to be edited:" output ONLY the newly defined classes and functions
 (keeping the structure/indention!!!) as they are in the original code but with detailed generated
-docstrings and without the code inside. The rules are:
+docstrings and without the code inside. Hence the rules are:
 1. generate detailed docstrings in google format (max 90 characters per line)
-2. just for EVERY newly defined functions and classes - if not existing: output the string: " "
-3. dont write any imports, called functions or other code or comments
+2. for every newly defined functions and classes - if not existing: output the string: " "
+3. not for imports or called functions/classes
 4. if function/class already has a docstring, try to improve or if already very well written reuse it
 5. format: only output docstrings with corresponding name of function/class 
-    and its args in brackets: def/class name(args):\n"""\ndocstring\n""" . So dont print the code
+    and empty brackets: def/class name(args):\n"""\ndocstring\n""" . So dont print the code
 6. your output must be readable to the ast module!
 7. if no code provided, output an empty string ""
-8. Start your output with "start" and end with "end".
+8. Start your output with "start" and end with "end". Dont indent the main output.
 
 Maybe you be given additional information about the repository this code is embedded in
-under "additional information:" to better construe the variables and context of the code.
-
+under "additional information:" to better construe the variables and context of the code snippet.
+Dont create docstrings for this part.
 In the end check if all rules are fulfilled and adjust if necessary.
 '''
+
+# For the given python file below "code to be edited:" output ONLY the newly defined classes and functions
+# (keeping the structure/indention!!!) as they are in the original code but with detailed generated
+# docstrings and without the code inside. Hence the rules are:
+# 1. generate detailed docstrings in google format (max 90 characters per line)
+# 2. just for every newly defined functions and classes - if not existing: output the string: " "
+# 3. dont write any imports, called functions or other code or comments
+# 4. if function/class already has a docstring, try to improve or if already very well written reuse it
+# 5. format: only output docstrings with corresponding name of function/class 
+#     and empty brackets: def/class name(args):\n"""\ndocstring\n""" . So dont print the code
+# 6. your output must be readable to the ast module!
+# 7. if no code provided, output an empty string ""
+# 8. Start your output with "start" and end with "end".
+
+# Maybe you be given additional information about the repository this code is embedded in
+# under "additional information:" to better construe the variables and context of the code.
+
+# In the end check if all rules are fulfilled and adjust if necessary.
+
         #command = '\n'.join(line.strip() for line in command.split('\n')).strip()
 
         print("    Docstrings are generated. Waiting for a gpt response...")
@@ -179,51 +198,22 @@ In the end check if all rules are fulfilled and adjust if necessary.
         #     print(snippet['code'])
 
 
-#NEW more readable COMMAND:
-
-#         command = '''
-# For the given python file below "code to be edited:" generate detailed docstrings for the 
-# newly defined function and classes. The rules are:
-# 1. Generate Docstrings: Provide detailed docstrings for each new class and function, formatted 
-# according to the Google style guide, with a line width not exceeding 90 characters.
-# 2. Exclusions: Do not generate docstrings for import statements or functions/classes that are 
-# only called but not defined within the provided code.
-# 3. Docstring Improvement: If a function or class already includes a docstring, the software 
-# should attempt to enhance it. If the existing docstring is already comprehensive, it can be 
-# reused.
-# 4. Output Format: The output should be formatted to include only the names of the classes or 
-# functions followed by their arguments (no return type annotations) and their corresponding docstrings, 
-# without including any of the actual code. Like this:
-# class ClassName(args):
-#     """ Detailed docstring in Google format. """
-#     def function_name(args): 
-#     """ Detailed docstring in Google format. """
-# 5. AST Module Readability: Ensure that the output is compatible with and readable by the ast 
-# module in Python.
-# 6. Handling No Code: If no code is provided to the software, it should output an empty string "".
-# 7. Output Delimiters: The output should begin with the word "start" and end with "end" to denote 
-# the start and finish of the processed docstring output.
-# 8. Additional Information: (If any additional context about the repository or the code snippet is 
-# provided, it should be considered to better understand the variables and context. However, no 
-# docstrings should be generated for this part.)
-
-# After processing, verify that all the rules have been met and make necessary adjustments to the 
-# output to ensure compliance with the above specifications.
-# '''
-
         command = '''
-For the given python file below "code to be edited:" output ONLY the newly defined classes and functions
+For the given python file below "code to be edited:" output the newly defined classes and functions
 (keeping the structure/indention!!!) as they are in the original code but with detailed generated
 docstrings and without the code inside. The rules are:
-1. generate detailed docstrings in google format (max 90 characters per line)
-2. for EVERY defined functions and classes - if not existing: output the string: " "
-3. not for imports or called functions/classes
-4. if function/class already has a docstring, try to improve or if already very well written reuse it
-5. format: only output docstrings with corresponding name of function/class 
-    and empty brackets: def/class name(args):\n"""\ndocstring\n""" . So dont print the code
-6. your output must be readable to the ast module!
-7. if no code provided, output an empty string ""
-8. Start your output with "start" and end with "end".
+1. Generate detailed docstrings in google format for ALL defined functions and classes 
+2. output format: output the the name and args of the function/class and below its generated docstring, also meaning
+that you should not print the code. Like this:
+def/class name(args):
+    """
+    Generated docstring
+    """
+3. Indent (bullet point 2.) the answers as they are in "code to be edited" -> keep the indention!
+4. A line of a docstring should not have more than 90 characters
+5. If a function/class already has a docstring, try to improve or if already very well written reuse i
+6. your output must be readable to the ast module
+7. Start your output with "start" and end with "end". Dont indent the main output!
 
 Maybe you be given additional information about the repository this code is embedded in
 under "additional information:" to better construe the variables and context of the code snippet.
@@ -231,6 +221,27 @@ Dont create docstrings for this part.
 
 In the end check if all rules are fulfilled and adjust if necessary.
 '''
+
+#old command -> consistent but for one big file one snippet was lacking all method-docstrings
+#         command = '''
+# For the given python file below "code to be edited:" output ONLY the newly defined classes and functions
+# (keeping the structure/indention!!!) as they are in the original code but with detailed generated
+# docstrings and without the code inside. Hence the rules are:
+# 1. generate detailed docstrings in google format (max 90 characters per line)
+# 2. for every newly defined functions and classes - if not existing: output the string: " "
+# 3. not for imports or called functions/classes
+# 4. if function/class already has a docstring, try to improve or if already very well written reuse it
+# 5. format: only output docstrings with corresponding name of function/class 
+#     and empty brackets: def/class name(args):\n"""\ndocstring\n""" . So dont print the code
+# 6. your output must be readable to the ast module!
+# 7. if no code provided, output an empty string ""
+# 8. Start your output with "start" and end with "end". Dont indent the main output.
+
+# Maybe you be given additional information about the repository this code is embedded in
+# under "additional information:" to better construe the variables and context of the code snippet.
+# Dont create docstrings for this part.
+# In the end check if all rules are fulfilled and adjust if necessary.
+# '''
 
         #command = ' '.join(line.strip() for line in command.split('\n')).strip()
         docstrings = '' #this will be a str of the edited func/classes
@@ -244,8 +255,12 @@ In the end check if all rules are fulfilled and adjust if necessary.
                     continue
             except Exception:
                 pass
-                
-            docstring = gptapi(code_snippet['code'], command, additional_info=info, Model=Model) + '\n'
+            # if i+1 != 2: #to examine a specific snippet
+            #     print(f'    skipped snippet {i+1} (line {line_start}-{line_start+code_snippet["lines"]})')
+            #     line_start += code_snippet['lines']
+            #     continue
+            temperature = 0.2
+            docstring = gptapi(code_snippet['code'], command, additional_info=info, Model=Model, temperature=temperature) + '\n'
             if write_gpt_output:
                 os.makedirs(os.path.dirname(gpt_path), exist_ok=True)
                 with open(gpt_path, "a") as file:
@@ -253,8 +268,4 @@ In the end check if all rules are fulfilled and adjust if necessary.
             docstrings += docstring
             line_start += code_snippet['lines']
 
-        
-        
         return docstrings
-
-
