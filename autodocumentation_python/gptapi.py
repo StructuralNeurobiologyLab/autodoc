@@ -62,7 +62,6 @@ def gpt_compare(command: str, Model: str,temperature: float = 0.2):
         model=Model,
         messages=messages,
         temperature=temperature,
-        top_p = 0.8
     )
     answer = response['choices'][0]['message']['content']
 
