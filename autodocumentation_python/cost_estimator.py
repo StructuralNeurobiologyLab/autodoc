@@ -77,21 +77,24 @@ def cost_estimator(max_lno: int, target_dir: str, model, cost):
     # print(f"Number of files with more than {max_lno} lines: {num_files_above_max}")
     # print(f"Total lines in files above {max_lno} lines: {lines_above_max} -> {lines_above_max * 20} tokens (with gpt4)")
     
-    #calculate for gpt4-32k (max_lno can be chooses freely (1200 is the default))
-    total_lines, total_words, num_files_above_max, lines_above_max = count_code_and_words(target_dir, max_lno)
+    total_lines, total_words, num_files_above_max, lines_above_max = count_code_and_words(target_dir, 300)
     expensive_gpt4_32k = (total_lines * 20 * 0.12 + total_words * 1.25 * 0.004) / 1000
     cheap_gpt4_32k = ((((total_lines - lines_above_max)*20*2) + (total_words *1.25)) * 0.004 + (lines_above_max * 20) * 0.12) / 1000
-
-    total_lines, total_words, num_files_above_max, lines_above_max = count_code_and_words(target_dir, max_lno=300)
     expensive_gpt4= (total_lines * 20 * 0.06 + total_words * 1.25 * 0.004) / 1000
     cheap_gpt4 = ((((total_lines - lines_above_max)*20*2) + (total_words *1.25)) * 0.004 + (lines_above_max * 20) * 0.06) / 1000
 
+#a file with 3597 lines has 36455 tokens, a file summary of 14321 tokens and produces an gpt output of 12016 tokens -> input 36455+14321 = 50776 tokens; output 12016 tokens
+                                                                                                                    #input 14.116 tokens per line; output 3.34 tokens per line
+    #comparison of docstrings: 14321+12016 = 26337 -> 26337/3597 = 7.32 tokens per line for comparison input and 12016/3597 = 3.34 tokens per line for comparison output
+    expensive_gpt_4_1106_preview = (((total_lines * (14.116+7.32) + total_words * 1.25) * 0.01 + (total_lines) *2* 3.34 * 0.03)/ 1000)*2    #*2 because the price actually seems to be like this
+
     print('To estimate the costs, we assume that one line of code corresponds to 20 tokens.')
     print(f'Estimated costs with settings...')
-    print(f"    --cost 'expensive' --Model 'gpt-4':      {expensive_gpt4:.2f}$")
-    print(f"    --cost 'expensive' --Model 'gpt-4-32k':  {expensive_gpt4_32k:.2f}$")
-    print(f"    --cost 'cheap' --Model 'gpt-4':          {cheap_gpt4:.2f}$")
-    print(f"    --cost 'cheap' --Model 'gpt-4-32k':      {cheap_gpt4_32k:.2f}$")
+    print(f"    --cost 'expensive' --Model 'gpt-4-1106-preview':        {expensive_gpt_4_1106_preview:.2f}$")
+    print(f"    --cost 'expensive' --Model 'gpt-4':                     {expensive_gpt4:.2f}$")
+    print(f"    --cost 'expensive' --Model 'gpt-4-32k':                 {expensive_gpt4_32k:.2f}$")
+    print(f"    --cost 'cheap' --Model 'gpt-4':                         {cheap_gpt4:.2f}$")
+    print(f"    --cost 'cheap' --Model 'gpt-4-32k':                     {cheap_gpt4_32k:.2f}$")
     print('Keep in mind: these are just rough estimates!!!\n')
 
     if cost == 'expensive' and model == 'gpt-4':
@@ -102,6 +105,10 @@ def cost_estimator(max_lno: int, target_dir: str, model, cost):
         print(f'Your are going to spent about {cheap_gpt4:.2f}$')
     elif cost == 'cheap' and model == 'gpt-4-32k':
         print(f'Your are going to spent about {cheap_gpt4_32k:.2f}$')
+    elif cost == 'expensive' and model == 'gpt-4-1106-preview':
+        print(f'Your are going to spent about {expensive_gpt_4_1106_preview:.2f}$')
+    else:
+        print('You have chooses a combination of setting I havent calculated the price for (probably cheap and gpt-4-1106-preview).')
 
     confirmation = input("\nDo you want to continue with the program? (yes[y]/no[n]): ")
 

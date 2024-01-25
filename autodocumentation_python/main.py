@@ -11,13 +11,14 @@ from distutils.util import strtobool
 import os
 import openai
 import yaml
-from autodocumentation_python.clone_source import clone_source, copy_py_files
+from autodocumentation_python.clone_source import clone_source, copy_py_files, check_path, delete_content_except_one_folder #these are also some helper functions
 from autodocumentation_python.summarize_repo import summarize_repo
 from autodocumentation_python.create_docstrings import create_docstrings
 from autodocumentation_python.insert_docstrings import insert_docstrings
 from autodocumentation_python.check_config import check_config
 from autodocumentation_python.cost_estimator import cost_estimator
 import traceback
+#from autodocumentation_python.filename_of_personal_repository_info import name_of_repository_info_function
 
 
 def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: str, summarize_repository) -> None:
@@ -62,7 +63,7 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
         elif Model == 'gpt-4':
             max_lno = 300
         elif Model == 'gpt-4-1106-preview':
-            max_lno = 300
+            max_lno = 700
         else:
             max_lno = 300
 
@@ -77,6 +78,7 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
     # CHECK CONFIG
     check_config() #and get api_key
+    edit_in_file = True if input("Do you want to edit your current files (y) or leaving them untouched and create a new folder called 'edited_repository' including the edited files (n)? (y/n): ") == 'y' else False
 
 
     # PRINT PARAMETERS
@@ -90,11 +92,13 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
 
 
     # INFO ABOUT REPOSITORY
+    #info_repo = f'info about repository:\n{read_SyConn_info()}'    #if you want to add your own info about the repository: make a file and function which returns a string with the info
+                                                                    #and comment out the next code block (try/except) as remove comment in line 21
     try:
         info_repo = summarize_repo(target_dir, summarize_repository, Model='gpt-4-1106-preview', detailed=detailed_repo_summary)
     except Exception:
         info_repo = summarize_repo(target_dir, summarize_repository, Model='gpt-3.5-turbo-16k', detailed=False)
-    
+
 
     # CREATE DOCSTRINGS
     print('\nAnalyzing files:')
@@ -114,6 +118,11 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
                 # inserts docstrings
                 try:
                     print('    Compare docstrings to old ones and insert them...')
+                    if edit_in_file:
+                        #find path to file which is located in the source directory (but the current analyzed file is selected within the source folder/file copied to the folder cwd/edited_repository)
+                        dir_source_diff = os.path.relpath(check_path(source_path), start=os.getcwd()) #dirs from cwd to (user specified) target_dir
+                        file_diff = os.path.relpath(file_path, start=os.path.join(os.getcwd(),'edited_repository')) #path from edited_repository to analyzed file
+                        file_path = os.path.join(os.getcwd(), dir_source_diff, file_diff)
                     insert_docstrings(file_path, docstrings, Model) 
                 except Exception as err:
                     print(f'    Error: {err}')
@@ -127,6 +136,9 @@ def main(source_path: str, cost: str, write_gpt_output: bool, max_lno, Model: st
         dest_path = os.path.join(target_dir, 'gpt_output')
         with open(os.path.join(dest_path, 'info_repo'), "w") as file:
             file.write(info_repo)
+    if edit_in_file:
+        delete_content_except_one_folder(os.path.join(os.getcwd(), 'edited_repository'), 'gpt_output')
+
 
 
     print('\nFinished!')
@@ -155,8 +167,8 @@ def execute():
     parser.add_argument("--cost", type=str, default='expensive', help="('expensive'/'cheap'); expensive: always uses gpt-4-32k; cheap: uses gpt-3.5-turbo-16k for files < 300 lines and gpt-4-32k for files > 300 lines")
     parser.add_argument("--write_gpt_output", dest='write_gpt_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); writes the GPT output/docstrings into a folder 'gpt-output' within the folder eddited repository ")
     parser.add_argument("--max_lno", type=int, help="(int_number); length [in lines] from which a code is split into snippets (max_lno is also approx. the length of the snippets)")
-    parser.add_argument("--Model", type=str, default='gpt-4', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
-    parser.add_argument("--summarize_repository", dest='summarize_repository', type=lambda x: bool(strtobool(x)), default=False, help="(True/False); generates a detailed summary of all .md & .rst files of the repository")
+    parser.add_argument("--Model", type=str, default='gpt-4-1106-preview', help="(gpt-4-32k/gpt-4); gpt-model used for docstring generation (if cost = 'expensive' for all files, if cost = 'cheap' only for ones > 300 lines) ")
+    parser.add_argument("--summarize_repository", dest='summarize_repository', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); generates a detailed summary of all .md & .rst files of the repository")
     #parser.add_argument("--save_terminal_output", dest='save_terminal_output', type=lambda x: bool(strtobool(x)), default=True, help="(True/False); saves the terminal output in a file 'terminal_output.txt' in the folder 'edited_repository'")
 
     args = parser.parse_args()

@@ -54,7 +54,7 @@ def gptapi(code: str, command: str, Model: str, additional_info: str = None,
 def gpt_compare(command: str, Model: str,temperature: float = 0.2):
 
     messages = [
-        {"role": "system", "content": "You are a docstring generator."},
+        {"role": "system", "content": "You improve gpt generated docstrings."},
         {"role": "user", "content": command},
     ]
 

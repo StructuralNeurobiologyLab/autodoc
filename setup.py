@@ -12,14 +12,14 @@ def read_readme():
 
 setup(
     name = 'autodocumentation_python',
-    version = '1.5.1',
+    version = '1.9',
     description='Automated documentationstring generation for python files within repositories, folders or for sinlge .py files.',
     long_description=read_readme(),
     long_description_content_type='text/markdown',
     url='https://github.com/StructuralNeurobiologyLab/autodoc',
     download_url='https://github.com/StructuralNeurobiologyLab/autodoc',
     author='Karl Heggenberger, Joergen Kornfeld.',
-    author_email='karl.heggenberger@bi.mpg.de',
+    author_email='Karl Heggenberger (LinkedIn)',
     packages = find_packages(),
     install_requires = install_requires,
     entry_points = {

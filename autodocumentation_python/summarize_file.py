@@ -115,3 +115,10 @@ def code_info(file_path):
         visit_node(node)
     
     return info
+
+# test_file_name = '' #must be present in current working directory
+# destination_file_name = ''
+# file_path = os.path.join(os.getcwd(), test_file_name)
+# dest = os.path.join(os.getcwd(), destination_file_name)
+# with open(dest, 'w') as f:
+#     f.write(code_info(file_path))

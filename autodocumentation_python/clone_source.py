@@ -29,6 +29,13 @@ def is_valid_url(url: str) -> bool:
     except Exception:
         return False
 
+def check_path(source_path):
+    if not os.path.exists(source_path):
+        rel_path = os.path.join(os.getcwd(), source_path)
+        return rel_path
+    else:
+        return source_path
+
 def clone_source(source_path: str, target_dir: str) -> None:
     """
     Clones a source from a given input (URL or local path) into a target directory. If the input is a valid
@@ -53,13 +60,6 @@ def clone_source(source_path: str, target_dir: str) -> None:
         else:
             print("Program terminated.")
             sys.exit(0)
-
-    def check_path(source_path):
-        if not os.path.exists(source_path):
-            rel_path = os.path.join(os.getcwd(), source_path)
-            return rel_path
-        else:
-            return source_path
 
     path = check_path(source_path)
 
@@ -108,3 +108,21 @@ def copy_py_files(path_source, path_dest):  #currently not needed
 
                 # Copy the file to the destination
                 shutil.copy(source_file, dest_file)
+
+
+def delete_content_except_one_folder(directory, folder_to_keep):
+    # List all files and directories in the specified directory
+    all_contents = os.listdir(directory)
+
+    # Iterate over the contents and delete them
+    for content in all_contents:
+        content_path = os.path.join(directory, content)
+
+        if os.path.isfile(content_path):
+            # If it's a file, delete it
+            os.remove(content_path)
+        elif os.path.isdir(content_path):
+            if content == folder_to_keep:
+                continue
+            elif content != folder_to_keep:
+                shutil.rmtree(content_path)
